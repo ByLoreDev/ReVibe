@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="ReVibe — reconnect with your people."
+    >
+
+    <title>ReVibe 💚</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+<body>
+
+    <main class="welcome">
+
+        <!-- LOGO -->
+        <section class="brand">
+
+            <div class="brand-mark">
+                <span>R</span>
+            </div>
+
+            <h1>ReVibe</h1>
+
+            <p>
+                Reconnect with your people.
+            </p>
+
+        </section>
+
+
+        <!-- LOGIN -->
+        <section class="auth-card">
+
+            <h2>¡Qué bueno verte! 💚</h2>
+
+            <p class="auth-subtitle">
+                Conecta con tus personas y vuelve a sentir la vibra.
+            </p>
+
+
+            <!-- GOOGLE -->
+            <button
+                type="button"
+                class="social-button google-button"
+            >
+                <span class="button-icon">G</span>
+                <span>Continuar con Google</span>
+            </button>
+
+
+            <!-- FACEBOOK -->
+            <button
+                type="button"
+                class="social-button facebook-button"
+            >
+                <span class="button-icon">f</span>
+                <span>Continuar con Facebook</span>
+            </button>
+
+
+            <!-- SEPARATOR -->
+            <div class="separator">
+                <span>o</span>
+            </div>
+
+
+            <!-- EMAIL -->
+            <form id="loginForm">
+
+                <label for="email">
+                    📧 Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="tu@email.com"
+                    autocomplete="email"
+                >
+
+
+                <label for="password">
+                    🔒 Contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Tu contraseña"
+                    autocomplete="current-password"
+                >
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    ENTRAR
+                </button>
+
+            </form>
+
+
+            <p class="register-text">
+                ¿Todavía no tienes cuenta?
+                <button
+                    type="button"
+                    class="link-button"
+                    id="registerButton"
+                >
+                    Crear cuenta
+                </button>
+            </p>
+
+        </section>
+
+<!-- =========================================
+     PERFIL DE REVIBE
+========================================= -->
+
+<section
+    class="profile-card"
+    id="profileSection"
+>
+
+    <div class="profile-header">
+
+        <button
+            type="button"
+            class="back-button"
+            id="backToLogin"
+        >
+            ←
+        </button>
+
+        <h2>Mi perfil</h2>
+
+        <div class="profile-header-space"></div>
+
+    </div>
+
+
+    <div class="profile-avatar">
+
+        <div class="avatar-placeholder">
+            <span>R</span>
+        </div>
+
+        <button
+            type="button"
+            class="avatar-edit"
+        >
+            +
+        </button>
+
+    </div>
+
+
+    <p class="profile-photo-text">
+        Tu foto de perfil
+    </p>
+
+
+    <form id="profileForm">
+
+        <label for="displayName">
+            ✨ Nombre
+        </label>
+
+        <input
+            type="text"
+            id="displayName"
+            placeholder="¿Cómo quieres que te conozcan?"
+            maxlength="40"
+        >
+
+
+        <label for="username">
+            @ Usuario
+        </label>
+
+        <div class="username-input">
+
+            <span>@</span>
+
+            <input
+                type="text"
+                id="username"
+                placeholder="tuusuario"
+                maxlength="20"
+                autocomplete="off"
+            >
+
+        </div>
+
+        <p
+            class="input-help"
+            id="usernameHelp"
+        >
+            3–20 caracteres: letras, números y _
+        </p>
+
+
+        <label for="personalMessage">
+            💭 Mensaje personal
+        </label>
+
+        <input
+            type="text"
+            id="personalMessage"
+            placeholder="¿Qué estás vibing hoy?"
+            maxlength="100"
+        >
+
+
+        <label for="status">
+            🟢 Estado
+        </label>
+
+        <select id="status">
+
+            <option value="online">
+                🟢 Conectada
+            </option>
+
+            <option value="away">
+                🟡 Ausente
+            </option>
+
+            <option value="busy">
+                🔴 Ocupada
+            </option>
+
+            <option value="offline">
+                ⚫ Desconectada
+            </option>
+
+        </select>
+
+
+        <label for="nowPlaying">
+            🎵 Escuchando ahora
+        </label>
+
+        <input
+            type="text"
+            id="nowPlaying"
+            placeholder="Artista — Canción"
+            maxlength="100"
+        >
+
+
+        <button
+            type="submit"
+            class="primary-button"
+        >
+            💚 GUARDAR PERFIL
+        </button>
+
+    </form>
+
+</section>
+        
+        <!-- FOOTER -->
+        <footer>
+            <p>♡ by LoreDev</p>
+            <span>Tu gente. Tu vibra. Tu espacio.</span>
+        </footer>
+
+    </main>
+
+
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>
