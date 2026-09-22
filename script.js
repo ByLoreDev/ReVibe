@@ -84,21 +84,24 @@ function showLogin() {
 
     authCard.style.display = "block";
 
-    profileSection.classList.remove("active");
-
+    profileSection.style.display = "none";
 }
 
+
+// =========================================
+// MOSTRAR PERFIL
+// =========================================
 
 function showProfile() {
 
     authCard.style.display = "none";
 
-    profileSection.classList.add("active");
-
+    profileSection.style.display = "block";
 }
 
+
 // =========================================
-// CREAR CUENTA / VOLVER A LOGIN
+// CREAR CUENTA / CAMBIAR A LOGIN
 // =========================================
 
 registerButton.addEventListener(
@@ -151,7 +154,7 @@ registerButton.addEventListener(
 
 
 // =========================================
-// FORMULARIO LOGIN / REGISTRO
+// LOGIN / REGISTRO
 // =========================================
 
 loginForm.addEventListener(
@@ -231,24 +234,27 @@ loginForm.addEventListener(
                         "💌 ¡Cuenta creada!\n\n" +
                         "Te enviamos un correo para confirmar tu cuenta."
                     );
-
                 }
 
 
                 registerMode = false;
+
 
                 document.querySelector(
                     ".auth-card h2"
                 ).textContent =
                     "¡Qué bueno verte! 💚";
 
+
                 document.querySelector(
                     ".auth-subtitle"
                 ).textContent =
                     "Conecta con tus personas y vuelve a sentir la vibra.";
 
+
                 submitButton.textContent =
                     "ENTRAR";
+
 
                 registerButton.textContent =
                     "Crear cuenta";
@@ -315,35 +321,29 @@ loginForm.addEventListener(
 
 async function loadProfile() {
 
+    console.log("💚 Cargando perfil...");
+
     const {
         data: sessionData,
         error: sessionError
     } = await supabaseClient.auth.getSession();
 
-
     if (sessionError) {
-
-        console.error(sessionError);
-
+        console.error("❌ Error obteniendo sesión:", sessionError);
         return;
     }
 
-
-    const session =
-        sessionData.session;
-
+    const session = sessionData.session;
 
     if (!session) {
-
+        console.log("⚠️ No hay sesión activa.");
         showLogin();
-
         return;
     }
 
+    const user = session.user;
 
-    const user =
-        session.user;
-
+    console.log("👤 Usuario:", user.id);
 
     const {
         data: profile,
@@ -362,35 +362,36 @@ async function loadProfile() {
         .eq("id", user.id)
         .maybeSingle();
 
-
     if (error) {
 
-        console.error(
-            "Error cargando perfil:",
-            error
-        );
+        console.error("❌ Error cargando perfil:", error);
 
         alert(
-            "⚠️ No pudimos cargar tu perfil."
+            "⚠️ No pudimos cargar tu perfil.\n\n" +
+            error.message
         );
 
         return;
     }
 
+    console.log("💚 PERFIL ENCONTRADO:", profile);
 
     if (!profile) {
 
-        console.log(
-            "El usuario todavía no tiene perfil."
+        console.error(
+            "❌ El usuario está autenticado pero no existe su perfil."
+        );
+
+        alert(
+            "⚠️ No encontramos tu perfil en ReVibe."
         );
 
         return;
     }
 
-
-    // =================================
+    // ================================
     // CARGAR DATOS EN EL FORMULARIO
-    // =================================
+    // ================================
 
     displayNameInput.value =
         profile.display_name || "";
@@ -407,9 +408,9 @@ async function loadProfile() {
     nowPlayingInput.value =
         profile.now_playing || "";
 
+    console.log("💚 Perfil cargado correctamente.");
 
     showProfile();
-
 }
 
 
@@ -439,7 +440,9 @@ profileForm.addEventListener(
                 "⚠️ Tu sesión ya no está activa."
             );
 
+
             showLogin();
+
 
             return;
         }
@@ -454,14 +457,18 @@ profileForm.addEventListener(
                 .trim()
                 .toLowerCase();
 
+
         const displayName =
             displayNameInput.value.trim();
+
 
         const personalMessage =
             personalMessageInput.value.trim();
 
+
         const status =
             statusInput.value;
+
 
         const nowPlaying =
             nowPlayingInput.value.trim();
@@ -479,10 +486,13 @@ profileForm.addEventListener(
             usernameHelp.textContent =
                 "⚠️ Usa entre 3 y 20 caracteres: letras, números y _";
 
+
             usernameHelp.style.color =
                 "#d9534f";
 
+
             usernameInput.focus();
+
 
             return;
         }
@@ -491,14 +501,19 @@ profileForm.addEventListener(
         usernameHelp.textContent =
             "3–20 caracteres: letras, números y _";
 
+
         usernameHelp.style.color =
             "";
 
 
         const saveButton =
-            profileForm.querySelector(".primary-button");
+            profileForm.querySelector(
+                ".primary-button"
+            );
+
 
         saveButton.disabled = true;
+
 
         saveButton.textContent =
             "GUARDANDO...";
@@ -511,6 +526,7 @@ profileForm.addEventListener(
             } = await supabaseClient
                 .from("profiles")
                 .update({
+
                     username:
                         username || null,
 
@@ -527,6 +543,7 @@ profileForm.addEventListener(
 
                     updated_at:
                         new Date().toISOString()
+
                 })
                 .eq("id", user.id);
 
@@ -559,10 +576,12 @@ profileForm.addEventListener(
                     "Prueba con otro."
                 );
 
+
             } else {
 
                 alert(
-                    "⚠️ No pudimos guardar tu perfil."
+                    "⚠️ No pudimos guardar tu perfil.\n\n" +
+                    error.message
                 );
             }
 
@@ -570,6 +589,7 @@ profileForm.addEventListener(
         } finally {
 
             saveButton.disabled = false;
+
 
             saveButton.textContent =
                 "💚 GUARDAR PERFIL";
@@ -581,7 +601,7 @@ profileForm.addEventListener(
 
 
 // =========================================
-// VOLVER / CERRAR SESIÓN
+// CERRAR SESIÓN
 // =========================================
 
 backToLogin.addEventListener(
@@ -600,6 +620,7 @@ backToLogin.addEventListener(
 
 
         await supabaseClient.auth.signOut();
+
 
         showLogin();
 
@@ -626,8 +647,10 @@ googleButton.addEventListener(
 
             console.error(error);
 
+
             alert(
-                "⚠️ No pudimos iniciar sesión con Google."
+                "⚠️ No pudimos iniciar sesión con Google.\n\n" +
+                error.message
             );
 
         }
@@ -655,8 +678,10 @@ facebookButton.addEventListener(
 
             console.error(error);
 
+
             alert(
-                "⚠️ No pudimos iniciar sesión con Facebook."
+                "⚠️ No pudimos iniciar sesión con Facebook.\n\n" +
+                error.message
             );
 
         }
