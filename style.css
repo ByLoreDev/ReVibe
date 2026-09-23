@@ -1,5 +1,5 @@
 /* =========================================
-   ReVibe
+   ReVibe 💚
    Global styles
 ========================================= */
 
@@ -60,7 +60,7 @@ body {
 
 
 /* =========================================
-   WELCOME
+   CONTENEDOR PRINCIPAL
 ========================================= */
 
 .welcome {
@@ -70,9 +70,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
 
-    padding: 40px 20px;
+    padding: 45px 20px 30px;
 }
 
 
@@ -82,7 +81,7 @@ body {
 
 .brand {
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 30px;
 }
 
 .brand-mark {
@@ -430,6 +429,387 @@ body {
 
 
 /* =========================================
+   🏠 HOME
+========================================= */
+
+.home-card {
+    width: 100%;
+    max-width: 650px;
+
+    display: none;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================
+   MI ESTADO
+========================================= */
+
+.my-status-card {
+    width: 100%;
+
+    padding: 28px;
+
+    background: rgba(255, 255, 255, 0.97);
+
+    border: 1px solid rgba(255, 255, 255, 0.9);
+
+    border-radius: 24px;
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(12px);
+}
+
+.my-profile-main {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+}
+
+
+/* =========================================
+   AVATAR HOME
+========================================= */
+
+.home-avatar {
+    position: relative;
+
+    flex-shrink: 0;
+
+    width: 100px;
+    height: 100px;
+
+    border-radius: 50%;
+
+    overflow: visible;
+}
+
+.home-avatar img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 4px solid white;
+
+    box-shadow:
+        0 8px 25px rgba(42, 89, 70, 0.18);
+}
+
+.home-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #45d6a0,
+            #20b978
+        );
+
+    color: white;
+
+    font-size: 40px;
+
+    font-weight: 800;
+
+    border: 4px solid white;
+
+    box-shadow:
+        0 8px 25px rgba(42, 89, 70, 0.18);
+}
+
+
+/* =========================================
+   ESTADO
+========================================= */
+
+.home-status-dot {
+    position: absolute;
+
+    right: 2px;
+    bottom: 4px;
+
+    width: 23px;
+    height: 23px;
+
+    border-radius: 50%;
+
+    border: 4px solid white;
+
+    background: var(--green);
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.home-status-dot.status-online {
+    background: #35c98b;
+}
+
+.home-status-dot.status-away {
+    background: #f4c542;
+}
+
+.home-status-dot.status-busy {
+    background: #e95454;
+}
+
+.home-status-dot.status-offline {
+    background: #8b9490;
+}
+
+
+/* =========================================
+   INFO DEL PERFIL
+========================================= */
+
+.home-profile-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.home-profile-info h2 {
+    margin-bottom: 3px;
+
+    font-size: 1.45rem;
+
+    font-weight: 800;
+
+    color: var(--text);
+}
+
+.home-username {
+    margin-bottom: 9px;
+
+    color: var(--green-dark);
+
+    font-size: 0.9rem;
+
+    font-weight: 700;
+}
+
+.home-personal-message {
+    color: var(--text-soft);
+
+    font-size: 0.9rem;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+}
+
+
+/* =========================================
+   EDITAR PERFIL
+========================================= */
+
+.edit-profile-button {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: var(--green-light);
+
+    color: var(--green-dark);
+
+    font-size: 1.15rem;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.edit-profile-button:hover {
+    transform: translateY(-2px);
+
+    background: #d8f9ea;
+}
+
+
+/* =========================================
+   NOW PLAYING
+========================================= */
+
+.home-now-playing {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-top: 22px;
+
+    padding: 13px 16px;
+
+    border-radius: 14px;
+
+    background: #f5fcf8;
+
+    border: 1px solid var(--border);
+
+    color: var(--text);
+
+    font-size: 0.88rem;
+
+    font-weight: 600;
+}
+
+.home-now-playing span:first-child {
+    font-size: 1rem;
+}
+
+
+/* =========================================
+   AMIGOS
+========================================= */
+
+.friends-home-card {
+    width: 100%;
+
+    margin-top: 18px;
+
+    padding: 28px;
+
+    background: rgba(255, 255, 255, 0.97);
+
+    border: 1px solid rgba(255, 255, 255, 0.9);
+
+    border-radius: 24px;
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(12px);
+}
+
+.friends-home-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 10px;
+}
+
+.friends-home-header h2 {
+    margin: 0;
+
+    font-size: 1.25rem;
+
+    font-weight: 800;
+}
+
+.friends-home-header p {
+    margin-top: 5px;
+
+    color: var(--text-soft);
+
+    font-size: 0.82rem;
+}
+
+.add-friend-button {
+    flex-shrink: 0;
+
+    border: none;
+
+    padding: 10px 15px;
+
+    border-radius: 12px;
+
+    background: var(--green-light);
+
+    color: var(--green-dark);
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.add-friend-button:hover {
+    transform: translateY(-2px);
+
+    background: #d7f5e8;
+}
+
+
+/* =========================================
+   LISTA DE AMIGOS
+========================================= */
+
+.friends-list {
+    width: 100%;
+}
+
+.empty-friends {
+    text-align: center;
+
+    padding: 40px 20px 25px;
+}
+
+.empty-friends-icon {
+    font-size: 48px;
+
+    margin-bottom: 12px;
+}
+
+.empty-friends h3 {
+    margin-bottom: 8px;
+
+    font-size: 1rem;
+
+    font-weight: 800;
+}
+
+.empty-friends p {
+    max-width: 400px;
+
+    margin: 0 auto 22px;
+
+    color: var(--text-soft);
+
+    font-size: 0.84rem;
+
+    line-height: 1.5;
+}
+
+.empty-friends .primary-button {
+    max-width: 320px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================
    PROFILE
 ========================================= */
 
@@ -518,15 +898,17 @@ body {
 .profile-avatar {
     position: relative;
 
-    width: 100px;
-    height: 100px;
+    width: 84px;
+    height: 84px;
 
     margin: 0 auto 8px;
 }
 
 .avatar-placeholder {
-    width: 100%;
-    height: 100%;
+    position: relative;
+
+    width: 84px;
+    height: 84px;
 
     display: flex;
 
@@ -535,46 +917,85 @@ body {
 
     border-radius: 50%;
 
+    overflow: hidden;
+
     background:
         linear-gradient(
-            145deg,
-            var(--green),
-            #63dfaa
+            135deg,
+            #45d6a0,
+            #20b978
         );
 
     color: white;
 
-    font-size: 3rem;
+    font-size: 36px;
 
     font-weight: 800;
 
     box-shadow:
-        0 10px 25px rgba(53, 201, 139, 0.20);
+        0 8px 20px rgba(32, 185, 120, 0.20);
+}
+
+.avatar-placeholder img {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: center;
+
+    border-radius: 50%;
 }
 
 .avatar-edit {
     position: absolute;
 
-    right: 0;
+    right: -2px;
+    bottom: -2px;
 
-    bottom: 2px;
+    width: 28px;
+    height: 28px;
 
-    width: 30px;
-    height: 30px;
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     border: 3px solid white;
 
     border-radius: 50%;
 
-    background: var(--green-dark);
+    background: #20b978;
 
     color: white;
 
-    font-size: 1.2rem;
+    font-size: 16px;
 
     font-weight: 700;
 
     cursor: pointer;
+
+    z-index: 5;
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.15);
+
+    transition:
+        transform 0.2s ease;
+}
+
+.avatar-edit:hover {
+    transform: scale(1.08);
+}
+
+.avatar-edit:disabled {
+    opacity: 0.7;
+
+    cursor: wait;
 }
 
 .profile-photo-text {
@@ -714,7 +1135,7 @@ body {
 ========================================= */
 
 footer {
-    margin-top: 25px;
+    margin-top: 28px;
 
     text-align: center;
 
@@ -731,15 +1152,57 @@ footer p {
     color: var(--green-dark);
 }
 
+footer span {
+    display: block;
+
+    color: var(--text-soft);
+}
+
 
 /* =========================================
    RESPONSIVE
 ========================================= */
 
+@media (max-width: 700px) {
+
+    .welcome {
+        padding: 30px 16px 25px;
+    }
+
+    .home-card {
+        max-width: 100%;
+    }
+
+    .my-status-card,
+    .friends-home-card {
+        padding: 22px 18px;
+    }
+
+    .home-avatar {
+        width: 82px;
+        height: 82px;
+    }
+
+    .home-status-dot {
+        width: 20px;
+        height: 20px;
+    }
+
+    .home-profile-info h2 {
+        font-size: 1.25rem;
+    }
+
+    .edit-profile-button {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+
 @media (max-width: 480px) {
 
     .welcome {
-        padding: 28px 16px;
+        padding: 25px 14px 22px;
     }
 
     .brand {
@@ -771,6 +1234,65 @@ footer p {
         min-height: 48px;
     }
 
+    .my-profile-main {
+        gap: 13px;
+    }
+
+    .home-avatar {
+        width: 72px;
+        height: 72px;
+    }
+
+    .home-status-dot {
+        width: 19px;
+        height: 19px;
+
+        right: 0;
+        bottom: 2px;
+    }
+
+    .home-profile-info h2 {
+        font-size: 1.1rem;
+    }
+
+    .home-username,
+    .home-personal-message {
+        font-size: 0.78rem;
+    }
+
+    .edit-profile-button {
+        width: 36px;
+        height: 36px;
+
+        font-size: 1rem;
+    }
+
+    .friends-home-header {
+        align-items: flex-start;
+    }
+
+    .friends-home-header h2 {
+        font-size: 1.05rem;
+    }
+
+    .friends-home-header p {
+        font-size: 0.75rem;
+    }
+
+    .add-friend-button {
+        padding: 8px 10px;
+
+        font-size: 0.75rem;
+    }
+
+    .empty-friends {
+        padding: 30px 10px 20px;
+    }
+
+    .empty-friends-icon {
+        font-size: 40px;
+    }
+
     .profile-card {
         max-width: 100%;
 
@@ -778,5 +1300,4 @@ footer p {
 
         border-radius: 20px;
     }
-
 }

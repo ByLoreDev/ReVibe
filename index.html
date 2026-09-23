@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -19,13 +21,19 @@
         rel="stylesheet"
         href="style.css"
     >
+
 </head>
+
 
 <body>
 
     <main class="welcome">
 
-        <!-- LOGO -->
+
+        <!-- =========================================
+             LOGO
+        ========================================== -->
+
         <section class="brand">
 
             <div class="brand-mark">
@@ -41,10 +49,16 @@
         </section>
 
 
-        <!-- LOGIN -->
+
+        <!-- =========================================
+             LOGIN
+        ========================================== -->
+
         <section class="auth-card">
 
-            <h2>¡Qué bueno verte! 💚</h2>
+            <h2>
+                ¡Qué bueno verte! 💚
+            </h2>
 
             <p class="auth-subtitle">
                 Conecta con tus personas y vuelve a sentir la vibra.
@@ -52,33 +66,59 @@
 
 
             <!-- GOOGLE -->
+
             <button
                 type="button"
                 class="social-button google-button"
             >
-                <span class="button-icon">G</span>
-                <span>Continuar con Google</span>
+
+                <span class="button-icon">
+                    G
+                </span>
+
+                <span>
+                    Continuar con Google
+                </span>
+
             </button>
 
 
+
             <!-- FACEBOOK -->
+
             <button
                 type="button"
                 class="social-button facebook-button"
             >
-                <span class="button-icon">f</span>
-                <span>Continuar con Facebook</span>
+
+                <span class="button-icon">
+                    f
+                </span>
+
+                <span>
+                    Continuar con Facebook
+                </span>
+
             </button>
 
 
+
             <!-- SEPARATOR -->
+
             <div class="separator">
-                <span>o</span>
+
+                <span>
+                    o
+                </span>
+
             </div>
 
 
-            <!-- EMAIL -->
+
+            <!-- LOGIN / REGISTRO -->
+
             <form id="loginForm">
+
 
                 <label for="email">
                     📧 Correo electrónico
@@ -91,6 +131,7 @@
                     placeholder="tu@email.com"
                     autocomplete="email"
                 >
+
 
 
                 <label for="password">
@@ -106,6 +147,7 @@
                 >
 
 
+
                 <button
                     type="submit"
                     class="primary-button"
@@ -113,11 +155,15 @@
                     ENTRAR
                 </button>
 
+
             </form>
 
 
+
             <p class="register-text">
+
                 ¿Todavía no tienes cuenta?
+
                 <button
                     type="button"
                     class="link-button"
@@ -125,167 +171,488 @@
                 >
                     Crear cuenta
                 </button>
+
             </p>
+
 
         </section>
 
-<!-- =========================================
-     PERFIL DE REVIBE
-========================================= -->
-
-<section
-    class="profile-card"
-    id="profileSection"
->
-
-    <div class="profile-header">
-
-        <button
-            type="button"
-            class="back-button"
-            id="backToLogin"
-        >
-            ←
-        </button>
-
-        <h2>Mi perfil</h2>
-
-        <div class="profile-header-space"></div>
-
-    </div>
 
 
-    <div class="profile-avatar">
+        <!-- =========================================
+             INICIO DE REVIBE
+        ========================================== -->
 
-        <div class="avatar-placeholder">
-            <span>R</span>
-        </div>
-
-        <button
-            type="button"
-            class="avatar-edit"
-        >
-            +
-        </button>
-
-    </div>
-
-
-    <p class="profile-photo-text">
-        Tu foto de perfil
-    </p>
-
-
-    <form id="profileForm">
-
-        <label for="displayName">
-            ✨ Nombre
-        </label>
-
-        <input
-            type="text"
-            id="displayName"
-            placeholder="¿Cómo quieres que te conozcan?"
-            maxlength="40"
+        <section
+            class="home-card"
+            id="homeSection"
+            style="display: none;"
         >
 
 
-        <label for="username">
-            @ Usuario
-        </label>
+            <!-- =====================================
+                 MI ESTADO
+            ====================================== -->
 
-        <div class="username-input">
+            <div class="my-status-card">
 
-            <span>@</span>
 
-            <input
-                type="text"
-                id="username"
-                placeholder="tuusuario"
-                maxlength="20"
-                autocomplete="off"
-            >
+                <div class="my-profile-main">
 
-        </div>
 
-        <p
-            class="input-help"
-            id="usernameHelp"
+                    <!-- AVATAR -->
+
+                    <div class="home-avatar">
+
+                        <img
+                            id="homeAvatar"
+                            src=""
+                            alt="Foto de perfil"
+                            style="display: none;"
+                        >
+
+
+                        <div
+                            class="home-avatar-placeholder"
+                            id="homeAvatarPlaceholder"
+                        >
+                            R
+                        </div>
+
+
+                        <span
+                            class="home-status-dot"
+                            id="homeStatusDot"
+                        ></span>
+
+                    </div>
+
+
+
+                    <!-- DATOS -->
+
+                    <div class="home-profile-info">
+
+
+                        <h2 id="homeDisplayName">
+                            Lorenna
+                        </h2>
+
+
+                        <p
+                            class="home-username"
+                            id="homeUsername"
+                        >
+                            @lowy
+                        </p>
+
+
+                        <p
+                            class="home-personal-message"
+                            id="homePersonalMessage"
+                        >
+                            💭 feeling today
+                        </p>
+
+
+                    </div>
+
+
+
+                    <!-- EDITAR PERFIL -->
+
+                    <button
+                        type="button"
+                        class="edit-profile-button"
+                        id="editProfileButton"
+                        title="Editar perfil"
+                    >
+                        ✏️
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- MÚSICA -->
+
+                <div class="home-now-playing">
+
+                    <span>
+                        🎵
+                    </span>
+
+                    <span id="homeNowPlaying">
+                        happy
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =====================================
+                 MIS AMIGOS
+            ====================================== -->
+
+            <div class="friends-home-card">
+
+
+                <div class="friends-home-header">
+
+
+                    <div>
+
+                        <h2>
+                            👥 Mis amigos
+                        </h2>
+
+                        <p>
+                            Tu gente, siempre cerca. 💚
+                        </p>
+
+                    </div>
+
+
+
+                    <button
+                        type="button"
+                        class="add-friend-button"
+                        id="addFriendButton"
+                    >
+                        + Agregar
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- LISTA DE AMIGOS -->
+
+                <div
+                    class="friends-list"
+                    id="friendsList"
+                >
+
+
+                    <!-- ESTADO VACÍO -->
+
+                    <div
+                        class="empty-friends"
+                        id="emptyFriends"
+                    >
+
+
+                        <div class="empty-friends-icon">
+                            👥
+                        </div>
+
+
+                        <h3>
+                            Aún no tienes amigos
+                        </h3>
+
+
+                        <p>
+                            Agrega a alguien y empieza a crear tu vibra. ✨
+                        </p>
+
+
+                        <button
+                            type="button"
+                            class="primary-button"
+                            id="addFirstFriendButton"
+                        >
+                            💚 AGREGAR MI PRIMER AMIGO
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             EDITAR PERFIL
+        ========================================== -->
+
+        <section
+            class="profile-card"
+            id="profileSection"
         >
-            3–20 caracteres: letras, números y _
-        </p>
 
 
-        <label for="personalMessage">
-            💭 Mensaje personal
-        </label>
+            <!-- HEADER -->
 
-        <input
-            type="text"
-            id="personalMessage"
-            placeholder="¿Qué estás vibing hoy?"
-            maxlength="100"
-        >
+            <div class="profile-header">
 
 
-        <label for="status">
-            🟢 Estado
-        </label>
-
-        <select id="status">
-
-            <option value="online">
-                🟢 Conectada
-            </option>
-
-            <option value="away">
-                🟡 Ausente
-            </option>
-
-            <option value="busy">
-                🔴 Ocupada
-            </option>
-
-            <option value="offline">
-                ⚫ Desconectada
-            </option>
-
-        </select>
+                <button
+                    type="button"
+                    class="back-button"
+                    id="backToHome"
+                    title="Volver al inicio"
+                >
+                    ←
+                </button>
 
 
-        <label for="nowPlaying">
-            🎵 Escuchando ahora
-        </label>
-
-        <input
-            type="text"
-            id="nowPlaying"
-            placeholder="Artista — Canción"
-            maxlength="100"
-        >
+                <h2>
+                    Mi perfil
+                </h2>
 
 
-        <button
-            type="submit"
-            class="primary-button"
-        >
-            💚 GUARDAR PERFIL
-        </button>
+                <div class="profile-header-space"></div>
 
-    </form>
 
-</section>
-        
-        <!-- FOOTER -->
+            </div>
+
+
+
+            <!-- FOTO -->
+
+            <div class="profile-avatar">
+
+
+                <div
+                    class="avatar-placeholder"
+                    id="avatarPlaceholder"
+                >
+
+                    <span id="avatarLetter">
+                        R
+                    </span>
+
+
+                    <img
+                        id="avatarImage"
+                        src=""
+                        alt="Foto de perfil"
+                        style="display: none;"
+                    >
+
+                </div>
+
+
+
+                <button
+                    type="button"
+                    class="avatar-edit"
+                    id="avatarEdit"
+                    title="Cambiar foto"
+                >
+                    +
+                </button>
+
+
+
+                <input
+                    type="file"
+                    id="avatarInput"
+                    accept="image/png,image/jpeg,image/webp"
+                    hidden
+                >
+
+
+            </div>
+
+
+
+            <p class="profile-photo-text">
+                Tu foto de perfil
+            </p>
+
+
+
+            <!-- FORMULARIO -->
+
+            <form id="profileForm">
+
+
+                <!-- NOMBRE -->
+
+                <label for="displayName">
+                    ✨ Nombre
+                </label>
+
+
+                <input
+                    type="text"
+                    id="displayName"
+                    placeholder="¿Cómo quieres que te conozcan?"
+                    maxlength="40"
+                >
+
+
+
+                <!-- USERNAME -->
+
+                <label for="username">
+                    @ Usuario
+                </label>
+
+
+                <div class="username-input">
+
+
+                    <span>
+                        @
+                    </span>
+
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="tuusuario"
+                        maxlength="20"
+                        autocomplete="off"
+                    >
+
+
+                </div>
+
+
+                <p
+                    class="input-help"
+                    id="usernameHelp"
+                >
+                    3–20 caracteres: letras, números y _
+                </p>
+
+
+
+                <!-- MENSAJE -->
+
+                <label for="personalMessage">
+                    💭 Mensaje personal
+                </label>
+
+
+                <input
+                    type="text"
+                    id="personalMessage"
+                    placeholder="¿Qué estás vibing hoy?"
+                    maxlength="100"
+                >
+
+
+
+                <!-- ESTADO -->
+
+                <label for="status">
+                    🟢 Estado
+                </label>
+
+
+                <select id="status">
+
+
+                    <option value="online">
+                        🟢 Conectada
+                    </option>
+
+
+                    <option value="away">
+                        🟡 Ausente
+                    </option>
+
+
+                    <option value="busy">
+                        🔴 Ocupada
+                    </option>
+
+
+                    <option value="offline">
+                        ⚫ Desconectada
+                    </option>
+
+
+                </select>
+
+
+
+                <!-- MÚSICA -->
+
+                <label for="nowPlaying">
+                    🎵 Escuchando ahora
+                </label>
+
+
+                <input
+                    type="text"
+                    id="nowPlaying"
+                    placeholder="Artista — Canción"
+                    maxlength="100"
+                >
+
+
+
+                <!-- GUARDAR -->
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    💚 GUARDAR PERFIL
+                </button>
+
+
+            </form>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             FOOTER
+        ========================================== -->
+
         <footer>
-            <p>♡ by LoreDev</p>
-            <span>Tu gente. Tu vibra. Tu espacio.</span>
+
+            <p>
+                ♡ by LoreDev
+            </p>
+
+            <span>
+                Tu gente. Tu vibra. Tu espacio.
+            </span>
+
         </footer>
+
 
     </main>
 
 
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+
+    <!-- =========================================
+         SUPABASE
+    ========================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <!-- =========================================
+         REVIBE JS
+    ========================================== -->
+
+    <script src="script.js"></script>
+
+
 </body>
+
 </html>

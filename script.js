@@ -1,6 +1,10 @@
 // =========================================
 // ReVibe 💚
-// Auth + Perfil
+// Auth + Inicio + Perfil + Avatar
+// =========================================
+
+// =========================================
+// SUPABASE
 // =========================================
 
 const SUPABASE_URL =
@@ -17,7 +21,7 @@ const supabaseClient =
 
 
 // =========================================
-// ELEMENTOS
+// ELEMENTOS - LOGIN
 // =========================================
 
 const loginForm =
@@ -41,14 +45,60 @@ const passwordInput =
 const authCard =
     document.querySelector(".auth-card");
 
+
+// =========================================
+// ELEMENTOS - INICIO
+// =========================================
+
+const homeSection =
+    document.getElementById("homeSection");
+
+const homeAvatar =
+    document.getElementById("homeAvatar");
+
+const homeAvatarPlaceholder =
+    document.getElementById("homeAvatarPlaceholder");
+
+const homeStatusDot =
+    document.getElementById("homeStatusDot");
+
+const homeDisplayName =
+    document.getElementById("homeDisplayName");
+
+const homeUsername =
+    document.getElementById("homeUsername");
+
+const homePersonalMessage =
+    document.getElementById("homePersonalMessage");
+
+const homeNowPlaying =
+    document.getElementById("homeNowPlaying");
+
+const editProfileButton =
+    document.getElementById("editProfileButton");
+
+const addFriendButton =
+    document.getElementById("addFriendButton");
+
+const addFirstFriendButton =
+    document.getElementById("addFirstFriendButton");
+
+const friendsList =
+    document.getElementById("friendsList");
+
+
+// =========================================
+// ELEMENTOS - PERFIL
+// =========================================
+
 const profileSection =
     document.getElementById("profileSection");
 
 const profileForm =
     document.getElementById("profileForm");
 
-const backToLogin =
-    document.getElementById("backToLogin");
+const backToHome =
+    document.getElementById("backToHome");
 
 const displayNameInput =
     document.getElementById("displayName");
@@ -70,6 +120,23 @@ const usernameHelp =
 
 
 // =========================================
+// ELEMENTOS - AVATAR
+// =========================================
+
+const avatarEdit =
+    document.getElementById("avatarEdit");
+
+const avatarInput =
+    document.getElementById("avatarInput");
+
+const avatarImage =
+    document.getElementById("avatarImage");
+
+const avatarLetter =
+    document.getElementById("avatarLetter");
+
+
+// =========================================
 // ESTADO
 // =========================================
 
@@ -82,9 +149,37 @@ let registerMode = false;
 
 function showLogin() {
 
-    authCard.style.display = "block";
+    if (authCard) {
+        authCard.style.display = "block";
+    }
 
-    profileSection.style.display = "none";
+    if (homeSection) {
+        homeSection.style.display = "none";
+    }
+
+    if (profileSection) {
+        profileSection.style.display = "none";
+    }
+}
+
+
+// =========================================
+// MOSTRAR INICIO
+// =========================================
+
+function showHome() {
+
+    if (authCard) {
+        authCard.style.display = "none";
+    }
+
+    if (profileSection) {
+        profileSection.style.display = "none";
+    }
+
+    if (homeSection) {
+        homeSection.style.display = "block";
+    }
 }
 
 
@@ -94,121 +189,197 @@ function showLogin() {
 
 function showProfile() {
 
-    authCard.style.display = "none";
+    if (authCard) {
+        authCard.style.display = "none";
+    }
 
-    profileSection.style.display = "block";
+    if (homeSection) {
+        homeSection.style.display = "none";
+    }
+
+    if (profileSection) {
+        profileSection.style.display = "block";
+    }
 }
 
 
 // =========================================
-// CREAR CUENTA / CAMBIAR A LOGIN
+// CREAR CUENTA / CAMBIAR LOGIN
 // =========================================
 
-registerButton.addEventListener(
-    "click",
-    function () {
+if (registerButton) {
 
-        registerMode = !registerMode;
+    registerButton.addEventListener(
+        "click",
+        function () {
 
-        const title =
-            document.querySelector(".auth-card h2");
+            registerMode = !registerMode;
 
-        const subtitle =
-            document.querySelector(".auth-subtitle");
+            const title =
+                document.querySelector(".auth-card h2");
 
-        const submitButton =
-            loginForm.querySelector(".primary-button");
+            const subtitle =
+                document.querySelector(".auth-subtitle");
+
+            const submitButton =
+                loginForm.querySelector(".primary-button");
 
 
-        if (registerMode) {
+            if (registerMode) {
 
-            title.textContent =
-                "¡Únete a ReVibe! 💚";
+                title.textContent =
+                    "¡Únete a ReVibe! 💚";
 
-            subtitle.textContent =
-                "Crea tu cuenta y empieza a conectar.";
+                subtitle.textContent =
+                    "Crea tu cuenta y empieza a conectar.";
 
-            submitButton.textContent =
-                "CREAR CUENTA";
+                submitButton.textContent =
+                    "CREAR CUENTA";
 
-            registerButton.textContent =
-                "Ya tengo una cuenta";
+                registerButton.textContent =
+                    "Ya tengo una cuenta";
 
-        } else {
+            } else {
 
-            title.textContent =
-                "¡Qué bueno verte! 💚";
+                title.textContent =
+                    "¡Qué bueno verte! 💚";
 
-            subtitle.textContent =
-                "Conecta con tus personas y vuelve a sentir la vibra.";
+                subtitle.textContent =
+                    "Conecta con tus personas y vuelve a sentir la vibra.";
 
-            submitButton.textContent =
-                "ENTRAR";
+                submitButton.textContent =
+                    "ENTRAR";
 
-            registerButton.textContent =
-                "Crear cuenta";
+                registerButton.textContent =
+                    "Crear cuenta";
+            }
+
         }
+    );
 
-    }
-);
+}
 
 
 // =========================================
 // LOGIN / REGISTRO
 // =========================================
 
-loginForm.addEventListener(
-    "submit",
-    async function (event) {
+if (loginForm) {
 
-        event.preventDefault();
+    loginForm.addEventListener(
+        "submit",
+        async function (event) {
 
+            event.preventDefault();
 
-        const email =
-            emailInput.value.trim();
+            const email =
+                emailInput.value.trim();
 
-        const password =
-            passwordInput.value.trim();
-
-
-        if (!email || !password) {
-
-            alert(
-                "💚 Completa tu correo y contraseña."
-            );
-
-            return;
-        }
+            const password =
+                passwordInput.value.trim();
 
 
-        if (password.length < 6) {
+            if (!email || !password) {
 
-            alert(
-                "🔒 La contraseña debe tener al menos 6 caracteres."
-            );
+                alert(
+                    "💚 Completa tu correo y contraseña."
+                );
 
-            return;
-        }
-
-
-        const submitButton =
-            loginForm.querySelector(".primary-button");
-
-        submitButton.disabled = true;
+                return;
+            }
 
 
-        try {
+            if (password.length < 6) {
 
-            // =================================
-            // CREAR CUENTA
-            // =================================
+                alert(
+                    "🔒 La contraseña debe tener al menos 6 caracteres."
+                );
 
-            if (registerMode) {
+                return;
+            }
+
+
+            const submitButton =
+                loginForm.querySelector(".primary-button");
+
+            submitButton.disabled = true;
+
+
+            try {
+
+                // =================================
+                // CREAR CUENTA
+                // =================================
+
+                if (registerMode) {
+
+                    const {
+                        data,
+                        error
+                    } = await supabaseClient.auth.signUp({
+                        email,
+                        password
+                    });
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    if (data.session) {
+
+                        alert(
+                            "🎉 ¡Cuenta creada!\n\n" +
+                            "Bienvenida a ReVibe 💚"
+                        );
+
+                        await loadProfile();
+
+                    } else {
+
+                        alert(
+                            "💌 ¡Cuenta creada!\n\n" +
+                            "Te enviamos un correo para confirmar tu cuenta."
+                        );
+                    }
+
+
+                    registerMode = false;
+
+
+                    const title =
+                        document.querySelector(".auth-card h2");
+
+                    const subtitle =
+                        document.querySelector(".auth-subtitle");
+
+
+                    title.textContent =
+                        "¡Qué bueno verte! 💚";
+
+                    subtitle.textContent =
+                        "Conecta con tus personas y vuelve a sentir la vibra.";
+
+                    submitButton.textContent =
+                        "ENTRAR";
+
+                    registerButton.textContent =
+                        "Crear cuenta";
+
+
+                    return;
+                }
+
+
+                // =================================
+                // LOGIN
+                // =================================
 
                 const {
                     data,
                     error
-                } = await supabaseClient.auth.signUp({
+                } = await supabaseClient.auth.signInWithPassword({
                     email,
                     password
                 });
@@ -219,100 +390,37 @@ loginForm.addEventListener(
                 }
 
 
-                if (data.session) {
-
-                    alert(
-                        "🎉 ¡Cuenta creada!\n\n" +
-                        "Bienvenida a ReVibe 💚"
-                    );
-
-                    await loadProfile();
-
-                } else {
-
-                    alert(
-                        "💌 ¡Cuenta creada!\n\n" +
-                        "Te enviamos un correo para confirmar tu cuenta."
-                    );
-                }
+                console.log(
+                    "💚 Sesión iniciada:",
+                    data.user
+                );
 
 
-                registerMode = false;
+                await loadProfile();
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Error de autenticación:",
+                    error
+                );
 
 
-                document.querySelector(
-                    ".auth-card h2"
-                ).textContent =
-                    "¡Qué bueno verte! 💚";
+                alert(
+                    "⚠️ " +
+                    getAuthErrorMessage(error)
+                );
 
+            } finally {
 
-                document.querySelector(
-                    ".auth-subtitle"
-                ).textContent =
-                    "Conecta con tus personas y vuelve a sentir la vibra.";
+                submitButton.disabled = false;
 
-
-                submitButton.textContent =
-                    "ENTRAR";
-
-
-                registerButton.textContent =
-                    "Crear cuenta";
-
-
-                return;
             }
-
-
-            // =================================
-            // LOGIN
-            // =================================
-
-            const {
-                data,
-                error
-            } = await supabaseClient.auth.signInWithPassword({
-                email,
-                password
-            });
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            console.log(
-                "Sesión iniciada:",
-                data.user
-            );
-
-
-            await loadProfile();
-
-
-        } catch (error) {
-
-            console.error(
-                "Error de autenticación:",
-                error
-            );
-
-
-            alert(
-                "⚠️ " +
-                getAuthErrorMessage(error)
-            );
-
-
-        } finally {
-
-            submitButton.disabled = false;
 
         }
+    );
 
-    }
-);
+}
 
 
 // =========================================
@@ -323,29 +431,57 @@ async function loadProfile() {
 
     console.log("💚 Cargando perfil...");
 
+
     const {
         data: sessionData,
         error: sessionError
     } = await supabaseClient.auth.getSession();
 
+
     if (sessionError) {
-        console.error("❌ Error obteniendo sesión:", sessionError);
+
+        console.error(
+            "❌ Error obteniendo sesión:",
+            sessionError
+        );
+
+        showLogin();
+
         return;
     }
 
-    const session = sessionData.session;
+
+    const session =
+        sessionData.session;
+
 
     if (!session) {
-        console.log("⚠️ No hay sesión activa.");
+
+        console.log(
+            "⚠️ No hay sesión activa."
+        );
+
         showLogin();
+
         return;
     }
 
-    const user = session.user;
 
-    console.log("👤 Usuario:", user.id);
+    const user =
+        session.user;
 
-    const {
+
+    console.log(
+        "👤 Usuario:",
+        user.id
+    );
+
+
+    // =========================================
+    // BUSCAR PERFIL
+    // =========================================
+
+    let {
         data: profile,
         error
     } = await supabaseClient
@@ -362,9 +498,13 @@ async function loadProfile() {
         .eq("id", user.id)
         .maybeSingle();
 
+
     if (error) {
 
-        console.error("❌ Error cargando perfil:", error);
+        console.error(
+            "❌ Error cargando perfil:",
+            error
+        );
 
         alert(
             "⚠️ No pudimos cargar tu perfil.\n\n" +
@@ -374,43 +514,655 @@ async function loadProfile() {
         return;
     }
 
-    console.log("💚 PERFIL ENCONTRADO:", profile);
+
+    // =========================================
+    // SI NO EXISTE PERFIL
+    // =========================================
 
     if (!profile) {
 
-        console.error(
-            "❌ El usuario está autenticado pero no existe su perfil."
+        console.log(
+            "⚠️ No existe perfil. Creándolo..."
         );
 
-        alert(
-            "⚠️ No encontramos tu perfil en ReVibe."
-        );
 
+        const defaultName =
+            user.user_metadata?.name ||
+            user.email?.split("@")[0] ||
+            "ReViber";
+
+
+        const {
+            data: newProfile,
+            error: createError
+        } = await supabaseClient
+            .from("profiles")
+            .insert({
+                id: user.id,
+                display_name: defaultName,
+                status: "online"
+            })
+            .select()
+            .single();
+
+
+        if (createError) {
+
+            console.error(
+                "❌ Error creando perfil:",
+                createError
+            );
+
+            alert(
+                "⚠️ No pudimos crear tu perfil.\n\n" +
+                createError.message
+            );
+
+            return;
+        }
+
+
+        profile =
+            newProfile;
+    }
+
+
+    // =========================================
+    // FORMULARIO
+    // =========================================
+
+    if (displayNameInput) {
+        displayNameInput.value =
+            profile.display_name || "";
+    }
+
+
+    if (usernameInput) {
+        usernameInput.value =
+            profile.username || "";
+    }
+
+
+    if (personalMessageInput) {
+        personalMessageInput.value =
+            profile.personal_message || "";
+    }
+
+
+    if (statusInput) {
+        statusInput.value =
+            profile.status || "online";
+    }
+
+
+    if (nowPlayingInput) {
+        nowPlayingInput.value =
+            profile.now_playing || "";
+    }
+
+
+    // =========================================
+    // AVATAR DEL PERFIL
+    // =========================================
+
+    if (profile.avatar_url) {
+
+        if (avatarImage) {
+            avatarImage.src =
+                profile.avatar_url;
+
+            avatarImage.style.display =
+                "block";
+        }
+
+        if (avatarLetter) {
+            avatarLetter.style.display =
+                "none";
+        }
+
+    } else {
+
+        if (avatarImage) {
+            avatarImage.style.display =
+                "none";
+        }
+
+        if (avatarLetter) {
+            avatarLetter.style.display =
+                "block";
+        }
+    }
+
+
+    // =========================================
+    // ACTUALIZAR INICIO
+    // =========================================
+
+    updateHomeProfile(profile);
+
+
+    console.log(
+        "💚 Perfil cargado correctamente."
+    );
+
+
+    showHome();
+}
+
+
+// =========================================
+// ACTUALIZAR PERFIL EN INICIO
+// =========================================
+
+function updateHomeProfile(profile) {
+
+    if (!profile) {
         return;
     }
 
-    // ================================
-    // CARGAR DATOS EN EL FORMULARIO
-    // ================================
 
-    displayNameInput.value =
-        profile.display_name || "";
+    // =========================================
+    // NOMBRE
+    // =========================================
 
-    usernameInput.value =
-        profile.username || "";
+    if (homeDisplayName) {
 
-    personalMessageInput.value =
-        profile.personal_message || "";
+        homeDisplayName.textContent =
+            profile.display_name ||
+            "ReViber";
+    }
 
-    statusInput.value =
-        profile.status || "online";
 
-    nowPlayingInput.value =
-        profile.now_playing || "";
+    // =========================================
+    // USERNAME
+    // =========================================
 
-    console.log("💚 Perfil cargado correctamente.");
+    if (homeUsername) {
 
-    showProfile();
+        homeUsername.textContent =
+            profile.username
+                ? "@" + profile.username
+                : "@usuario";
+    }
+
+
+    // =========================================
+    // MENSAJE
+    // =========================================
+
+    if (homePersonalMessage) {
+
+        homePersonalMessage.textContent =
+            profile.personal_message
+                ? "💭 " + profile.personal_message
+                : "💭 Sin mensaje personal";
+    }
+
+
+    // =========================================
+    // NOW PLAYING
+    // =========================================
+
+    if (homeNowPlaying) {
+
+        homeNowPlaying.textContent =
+            profile.now_playing ||
+            "Nada por ahora";
+    }
+
+
+    // =========================================
+    // ESTADO
+    // =========================================
+
+    updateStatusDot(
+        profile.status || "online"
+    );
+
+
+    // =========================================
+    // AVATAR
+    // =========================================
+
+    updateHomeAvatar(
+        profile.avatar_url,
+        profile.display_name
+    );
+}
+
+
+// =========================================
+// ACTUALIZAR PUNTO DE ESTADO
+// =========================================
+
+function updateStatusDot(status) {
+
+    if (!homeStatusDot) {
+        return;
+    }
+
+
+    homeStatusDot.classList.remove(
+        "status-online",
+        "status-away",
+        "status-busy",
+        "status-offline"
+    );
+
+
+    homeStatusDot.classList.add(
+        "status-" + status
+    );
+
+
+    homeStatusDot.title =
+        getStatusText(status);
+}
+
+
+// =========================================
+// TEXTO DEL ESTADO
+// =========================================
+
+function getStatusText(status) {
+
+    const statuses = {
+
+        online: "Conectada",
+
+        away: "Ausente",
+
+        busy: "Ocupada",
+
+        offline: "Desconectada"
+
+    };
+
+
+    return statuses[status] ||
+        "Conectada";
+}
+
+
+// =========================================
+// ACTUALIZAR AVATAR EN INICIO
+// =========================================
+
+function updateHomeAvatar(
+    avatarUrl,
+    displayName
+) {
+
+    const letter =
+        (
+            displayName ||
+            "R"
+        )
+        .trim()
+        .charAt(0)
+        .toUpperCase();
+
+
+    if (avatarUrl) {
+
+        if (homeAvatar) {
+
+            homeAvatar.src =
+                avatarUrl;
+
+            homeAvatar.style.display =
+                "block";
+        }
+
+        if (homeAvatarPlaceholder) {
+
+            homeAvatarPlaceholder.style.display =
+                "none";
+        }
+
+    } else {
+
+        if (homeAvatar) {
+
+            homeAvatar.style.display =
+                "none";
+        }
+
+        if (homeAvatarPlaceholder) {
+
+            homeAvatarPlaceholder.textContent =
+                letter;
+
+            homeAvatarPlaceholder.style.display =
+                "flex";
+        }
+    }
+}
+
+
+// =========================================
+// BOTÓN EDITAR PERFIL
+// =========================================
+
+if (editProfileButton) {
+
+    editProfileButton.addEventListener(
+        "click",
+        function () {
+
+            showProfile();
+
+        }
+    );
+}
+
+
+// =========================================
+// BOTÓN VOLVER A INICIO
+// =========================================
+
+if (backToHome) {
+
+    backToHome.addEventListener(
+        "click",
+        function () {
+
+            showHome();
+
+        }
+    );
+}
+
+
+// =========================================
+// AGREGAR AMIGO
+// =========================================
+
+function comingSoonFriends() {
+
+    alert(
+        "👥 ¡Muy pronto!\n\n" +
+        "Aquí podrás buscar personas por su @usuario y agregarlas a tus amigos. 💚"
+    );
+}
+
+
+if (addFriendButton) {
+
+    addFriendButton.addEventListener(
+        "click",
+        comingSoonFriends
+    );
+}
+
+
+if (addFirstFriendButton) {
+
+    addFirstFriendButton.addEventListener(
+        "click",
+        comingSoonFriends
+    );
+}
+
+
+// =========================================
+// FOTO DE PERFIL
+// =========================================
+
+if (avatarEdit && avatarInput) {
+
+    avatarEdit.addEventListener(
+        "click",
+        function () {
+
+            avatarInput.click();
+
+        }
+    );
+
+
+    avatarInput.addEventListener(
+        "change",
+        async function () {
+
+            const file =
+                avatarInput.files[0];
+
+
+            if (!file) {
+                return;
+            }
+
+
+            // =========================================
+            // VALIDAR TIPO
+            // =========================================
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+
+            if (!allowedTypes.includes(file.type)) {
+
+                alert(
+                    "⚠️ Solo puedes subir imágenes JPG, PNG o WEBP."
+                );
+
+                avatarInput.value = "";
+
+                return;
+            }
+
+
+            // =========================================
+            // VALIDAR TAMAÑO
+            // =========================================
+
+            const maxSize =
+                5 * 1024 * 1024;
+
+
+            if (file.size > maxSize) {
+
+                alert(
+                    "⚠️ La imagen no puede superar los 5 MB."
+                );
+
+                avatarInput.value = "";
+
+                return;
+            }
+
+
+            try {
+
+                avatarEdit.disabled =
+                    true;
+
+                avatarEdit.textContent =
+                    "…";
+
+
+                // =========================================
+                // SESIÓN
+                // =========================================
+
+                const {
+                    data: sessionData,
+                    error: sessionError
+                } = await supabaseClient.auth.getSession();
+
+
+                if (
+                    sessionError ||
+                    !sessionData.session
+                ) {
+
+                    throw new Error(
+                        "Tu sesión ya no está activa."
+                    );
+                }
+
+
+                const user =
+                    sessionData.session.user;
+
+
+                // =========================================
+                // ARCHIVO
+                // =========================================
+
+                const extension =
+                    file.name
+                        .split(".")
+                        .pop()
+                        .toLowerCase();
+
+
+                const filePath =
+                    `${user.id}/avatar-${Date.now()}.${extension}`;
+
+
+                console.log(
+                    "📸 Subiendo avatar:",
+                    filePath
+                );
+
+
+                // =========================================
+                // SUBIR STORAGE
+                // =========================================
+
+                const {
+                    error: uploadError
+                } = await supabaseClient
+                    .storage
+                    .from("avatars")
+                    .upload(
+                        filePath,
+                        file,
+                        {
+                            cacheControl: "3600",
+                            upsert: false,
+                            contentType: file.type
+                        }
+                    );
+
+
+                if (uploadError) {
+                    throw uploadError;
+                }
+
+
+                // =========================================
+                // URL PÚBLICA
+                // =========================================
+
+                const {
+                    data: publicUrlData
+                } = supabaseClient
+                    .storage
+                    .from("avatars")
+                    .getPublicUrl(
+                        filePath
+                    );
+
+
+                const avatarUrl =
+                    publicUrlData.publicUrl;
+
+
+                // =========================================
+                // GUARDAR EN PROFILES
+                // =========================================
+
+                const {
+                    error: profileError
+                } = await supabaseClient
+                    .from("profiles")
+                    .update({
+                        avatar_url: avatarUrl,
+                        updated_at:
+                            new Date().toISOString()
+                    })
+                    .eq(
+                        "id",
+                        user.id
+                    );
+
+
+                if (profileError) {
+                    throw profileError;
+                }
+
+
+                // =========================================
+                // MOSTRAR EN PERFIL
+                // =========================================
+
+                if (avatarImage) {
+
+                    avatarImage.src =
+                        avatarUrl;
+
+                    avatarImage.style.display =
+                        "block";
+                }
+
+
+                if (avatarLetter) {
+
+                    avatarLetter.style.display =
+                        "none";
+                }
+
+
+                // =========================================
+                // MOSTRAR EN INICIO
+                // =========================================
+
+                updateHomeAvatar(
+                    avatarUrl,
+                    displayNameInput?.value
+                );
+
+
+                alert(
+                    "📸 ¡Foto de perfil actualizada!"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Error subiendo avatar:",
+                    error
+                );
+
+
+                alert(
+                    "⚠️ No pudimos subir tu foto.\n\n" +
+                    error.message
+                );
+
+
+            } finally {
+
+                avatarEdit.disabled =
+                    false;
+
+                avatarEdit.textContent =
+                    "+";
+
+                avatarInput.value = "";
+
+            }
+
+        }
+    );
 }
 
 
@@ -418,114 +1170,147 @@ async function loadProfile() {
 // GUARDAR PERFIL
 // =========================================
 
-profileForm.addEventListener(
-    "submit",
-    async function (event) {
+if (profileForm) {
 
-        event.preventDefault();
+    profileForm.addEventListener(
+        "submit",
+        async function (event) {
 
+            event.preventDefault();
 
-        const {
-            data: sessionData
-        } = await supabaseClient.auth.getSession();
-
-
-        const session =
-            sessionData.session;
-
-
-        if (!session) {
-
-            alert(
-                "⚠️ Tu sesión ya no está activa."
-            );
-
-
-            showLogin();
-
-
-            return;
-        }
-
-
-        const user =
-            session.user;
-
-
-        const username =
-            usernameInput.value
-                .trim()
-                .toLowerCase();
-
-
-        const displayName =
-            displayNameInput.value.trim();
-
-
-        const personalMessage =
-            personalMessageInput.value.trim();
-
-
-        const status =
-            statusInput.value;
-
-
-        const nowPlaying =
-            nowPlayingInput.value.trim();
-
-
-        // =================================
-        // VALIDAR USERNAME
-        // =================================
-
-        if (
-            username &&
-            !/^[a-z0-9_]{3,20}$/.test(username)
-        ) {
-
-            usernameHelp.textContent =
-                "⚠️ Usa entre 3 y 20 caracteres: letras, números y _";
-
-
-            usernameHelp.style.color =
-                "#d9534f";
-
-
-            usernameInput.focus();
-
-
-            return;
-        }
-
-
-        usernameHelp.textContent =
-            "3–20 caracteres: letras, números y _";
-
-
-        usernameHelp.style.color =
-            "";
-
-
-        const saveButton =
-            profileForm.querySelector(
-                ".primary-button"
-            );
-
-
-        saveButton.disabled = true;
-
-
-        saveButton.textContent =
-            "GUARDANDO...";
-
-
-        try {
 
             const {
-                error
-            } = await supabaseClient
-                .from("profiles")
-                .update({
+                data: sessionData
+            } = await supabaseClient.auth.getSession();
+
+
+            const session =
+                sessionData.session;
+
+
+            if (!session) {
+
+                alert(
+                    "⚠️ Tu sesión ya no está activa."
+                );
+
+                showLogin();
+
+                return;
+            }
+
+
+            const user =
+                session.user;
+
+
+            const username =
+                usernameInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const displayName =
+                displayNameInput.value.trim();
+
+
+            const personalMessage =
+                personalMessageInput.value.trim();
+
+
+            const status =
+                statusInput.value;
+
+
+            const nowPlaying =
+                nowPlayingInput.value.trim();
+
+
+            // =========================================
+            // VALIDAR USERNAME
+            // =========================================
+
+            if (
+                username &&
+                !/^[a-z0-9_]{3,20}$/.test(username)
+            ) {
+
+                usernameHelp.textContent =
+                    "⚠️ Usa entre 3 y 20 caracteres: letras, números y _";
+
+                usernameHelp.style.color =
+                    "#d9534f";
+
+                usernameInput.focus();
+
+                return;
+            }
+
+
+            usernameHelp.textContent =
+                "3–20 caracteres: letras, números y _";
+
+            usernameHelp.style.color =
+                "";
+
+
+            const saveButton =
+                profileForm.querySelector(
+                    ".primary-button"
+                );
+
+
+            saveButton.disabled =
+                true;
+
+            saveButton.textContent =
+                "GUARDANDO...";
+
+
+            try {
+
+                const {
+                    error
+                } = await supabaseClient
+                    .from("profiles")
+                    .update({
+
+                        username:
+                            username || null,
+
+                        display_name:
+                            displayName || null,
+
+                        personal_message:
+                            personalMessage || null,
+
+                        status,
+
+                        now_playing:
+                            nowPlaying || null,
+
+                        updated_at:
+                            new Date().toISOString()
+
+                    })
+                    .eq(
+                        "id",
+                        user.id
+                    );
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                // =========================================
+                // ACTUALIZAR INICIO INMEDIATAMENTE
+                // =========================================
+
+                const currentProfile = {
+
+                    id: user.id,
 
                     username:
                         username || null,
@@ -541,153 +1326,141 @@ profileForm.addEventListener(
                     now_playing:
                         nowPlaying || null,
 
-                    updated_at:
-                        new Date().toISOString()
+                    avatar_url:
+                        avatarImage?.style.display !== "none"
+                            ? avatarImage?.src
+                            : null
 
-                })
-                .eq("id", user.id);
-
-
-            if (error) {
-                throw error;
-            }
+                };
 
 
-            alert(
-                "💚 ¡Perfil guardado!\n\n" +
-                "Tu perfil de ReVibe está listo."
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error guardando perfil:",
-                error
-            );
-
-
-            if (
-                error.code === "23505"
-            ) {
-
-                alert(
-                    "⚠️ Ese @usuario ya está ocupado.\n\n" +
-                    "Prueba con otro."
+                updateHomeProfile(
+                    currentProfile
                 );
 
 
-            } else {
-
                 alert(
-                    "⚠️ No pudimos guardar tu perfil.\n\n" +
-                    error.message
+                    "💚 ¡Perfil guardado!\n\n" +
+                    "Tu perfil de ReVibe está listo."
                 );
+
+
+                showHome();
+
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Error guardando perfil:",
+                    error
+                );
+
+
+                if (
+                    error.code === "23505"
+                ) {
+
+                    alert(
+                        "⚠️ Ese @usuario ya está ocupado.\n\n" +
+                        "Prueba con otro."
+                    );
+
+
+                } else {
+
+                    alert(
+                        "⚠️ No pudimos guardar tu perfil.\n\n" +
+                        error.message
+                    );
+
+                }
+
+
+            } finally {
+
+                saveButton.disabled =
+                    false;
+
+                saveButton.textContent =
+                    "💚 GUARDAR PERFIL";
+
             }
 
-
-        } finally {
-
-            saveButton.disabled = false;
-
-
-            saveButton.textContent =
-                "💚 GUARDAR PERFIL";
-
         }
-
-    }
-);
-
-
-// =========================================
-// CERRAR SESIÓN
-// =========================================
-
-backToLogin.addEventListener(
-    "click",
-    async function () {
-
-        const confirmar =
-            confirm(
-                "¿Quieres cerrar sesión de ReVibe?"
-            );
-
-
-        if (!confirmar) {
-            return;
-        }
-
-
-        await supabaseClient.auth.signOut();
-
-
-        showLogin();
-
-    }
-);
+    );
+}
 
 
 // =========================================
 // GOOGLE
 // =========================================
 
-googleButton.addEventListener(
-    "click",
-    async function () {
+if (googleButton) {
 
-        const {
-            error
-        } = await supabaseClient.auth.signInWithOAuth({
-            provider: "google"
-        });
+    googleButton.addEventListener(
+        "click",
+        async function () {
 
-
-        if (error) {
-
-            console.error(error);
+            const {
+                error
+            } = await supabaseClient.auth.signInWithOAuth({
+                provider: "google"
+            });
 
 
-            alert(
-                "⚠️ No pudimos iniciar sesión con Google.\n\n" +
-                error.message
-            );
+            if (error) {
+
+                console.error(
+                    error
+                );
+
+
+                alert(
+                    "⚠️ No pudimos iniciar sesión con Google.\n\n" +
+                    error.message
+                );
+
+            }
 
         }
-
-    }
-);
+    );
+}
 
 
 // =========================================
 // FACEBOOK
 // =========================================
 
-facebookButton.addEventListener(
-    "click",
-    async function () {
+if (facebookButton) {
 
-        const {
-            error
-        } = await supabaseClient.auth.signInWithOAuth({
-            provider: "facebook"
-        });
+    facebookButton.addEventListener(
+        "click",
+        async function () {
 
-
-        if (error) {
-
-            console.error(error);
+            const {
+                error
+            } = await supabaseClient.auth.signInWithOAuth({
+                provider: "facebook"
+            });
 
 
-            alert(
-                "⚠️ No pudimos iniciar sesión con Facebook.\n\n" +
-                error.message
-            );
+            if (error) {
+
+                console.error(
+                    error
+                );
+
+
+                alert(
+                    "⚠️ No pudimos iniciar sesión con Facebook.\n\n" +
+                    error.message
+                );
+
+            }
 
         }
-
-    }
-);
+    );
+}
 
 
 // =========================================
@@ -706,7 +1479,9 @@ function getAuthErrorMessage(error) {
         )
     ) {
 
-        return "El correo o la contraseña no son correctos.";
+        return (
+            "El correo o la contraseña no son correctos."
+        );
 
     }
 
@@ -717,7 +1492,9 @@ function getAuthErrorMessage(error) {
         )
     ) {
 
-        return "Este correo ya tiene una cuenta en ReVibe.";
+        return (
+            "Este correo ya tiene una cuenta en ReVibe."
+        );
 
     }
 
@@ -728,13 +1505,30 @@ function getAuthErrorMessage(error) {
         )
     ) {
 
-        return "La contraseña debe tener al menos 6 caracteres.";
+        return (
+            "La contraseña debe tener al menos 6 caracteres."
+        );
 
     }
 
 
-    return message ||
-        "Ocurrió un error. Inténtalo nuevamente.";
+    if (
+        message.includes(
+            "Email not confirmed"
+        )
+    ) {
+
+        return (
+            "Primero debes confirmar tu correo electrónico."
+        );
+
+    }
+
+
+    return (
+        message ||
+        "Ocurrió un error. Inténtalo nuevamente."
+    );
 }
 
 
@@ -746,9 +1540,18 @@ supabaseClient.auth.onAuthStateChange(
     function (event, session) {
 
         console.log(
-            "ReVibe Auth:",
+            "💚 ReVibe Auth:",
             event
         );
+
+
+        if (
+            event === "SIGNED_OUT"
+        ) {
+
+            showLogin();
+
+        }
 
     }
 );
@@ -760,6 +1563,11 @@ supabaseClient.auth.onAuthStateChange(
 
 async function initializeReVibe() {
 
+    console.log(
+        "🚀 Iniciando ReVibe..."
+    );
+
+
     const {
         data,
         error
@@ -768,7 +1576,10 @@ async function initializeReVibe() {
 
     if (error) {
 
-        console.error(error);
+        console.error(
+            "❌ Error comprobando sesión:",
+            error
+        );
 
         showLogin();
 
@@ -778,9 +1589,17 @@ async function initializeReVibe() {
 
     if (data.session) {
 
+        console.log(
+            "💚 Sesión encontrada."
+        );
+
         await loadProfile();
 
     } else {
+
+        console.log(
+            "👋 No hay sesión."
+        );
 
         showLogin();
 
@@ -788,5 +1607,9 @@ async function initializeReVibe() {
 
 }
 
+
+// =========================================
+// INICIAR REVIBE
+// =========================================
 
 initializeReVibe();
