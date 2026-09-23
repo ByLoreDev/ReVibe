@@ -77,6 +77,18 @@ const homeNowPlaying =
 const editProfileButton =
     document.getElementById("editProfileButton");
 
+    const profileMenuButton =
+    document.getElementById("profileMenuButton");
+
+const profileMenu =
+    document.getElementById("profileMenu");
+
+const menuEditProfile =
+    document.getElementById("menuEditProfile");
+
+const menuSignOut =
+    document.getElementById("menuSignOut");
+
 const addFriendButton =
     document.getElementById("addFriendButton");
 
@@ -844,6 +856,49 @@ function updateHomeAvatar(
 // BOTÓN EDITAR PERFIL
 // =========================================
 
+// =========================================
+// MENÚ DEL PERFIL
+// =========================================
+
+if (profileMenuButton && profileMenu) {
+
+    profileMenuButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            profileMenu.classList.toggle("active");
+
+        }
+    );
+}
+
+
+// Cerrar menú al hacer clic fuera
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        if (
+            profileMenu &&
+            !profileMenu.contains(event.target) &&
+            !profileMenuButton.contains(event.target)
+        ) {
+
+            profileMenu.classList.remove("active");
+
+        }
+
+    }
+);
+
+
+// =========================================
+// EDITAR PERFIL
+// =========================================
+
 if (editProfileButton) {
 
     editProfileButton.addEventListener(
@@ -851,6 +906,94 @@ if (editProfileButton) {
         function () {
 
             showProfile();
+
+        }
+    );
+}
+
+
+if (menuEditProfile) {
+
+    menuEditProfile.addEventListener(
+        "click",
+        function () {
+
+            profileMenu.classList.remove("active");
+
+            showProfile();
+
+        }
+    );
+}
+
+
+// =========================================
+// CERRAR SESIÓN
+// =========================================
+
+if (menuSignOut) {
+
+    menuSignOut.addEventListener(
+        "click",
+        async function () {
+
+            const confirmar =
+                confirm(
+                    "¿Quieres cerrar sesión de ReVibe? 💚"
+                );
+
+
+            if (!confirmar) {
+                return;
+            }
+
+
+            try {
+
+                const {
+                    error
+                } = await supabaseClient.auth.signOut();
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                profileMenu.classList.remove(
+                    "active"
+                );
+
+
+                showLogin();
+
+
+                // Limpiar formularios
+
+                if (loginForm) {
+                    loginForm.reset();
+                }
+
+
+                console.log(
+                    "👋 Sesión cerrada."
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Error cerrando sesión:",
+                    error
+                );
+
+
+                alert(
+                    "⚠️ No pudimos cerrar la sesión.\n\n" +
+                    error.message
+                );
+
+            }
 
         }
     );

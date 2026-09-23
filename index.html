@@ -261,14 +261,35 @@
 
                     <!-- EDITAR PERFIL -->
 
-                    <button
-                        type="button"
-                        class="edit-profile-button"
-                        id="editProfileButton"
-                        title="Editar perfil"
-                    >
-                        ✏️
-                    </button>
+                   <div class="profile-actions">
+   
+
+    <button
+        type="button"
+        class="profile-menu-button"
+        id="profileMenuButton"
+        title="Más opciones">
+        ⋮
+    </button>
+
+    <div
+        class="profile-menu"
+        id="profileMenu">
+
+        <button
+            type="button"
+            id="menuEditProfile">
+            ✏️ Editar perfil
+        </button>
+
+        <button
+            type="button"
+            id="menuSignOut">
+            🚪 Cerrar sesión
+        </button>
+
+    </div>
+</div>
 
 
                 </div>
@@ -613,6 +634,72 @@
 
 
         </section>
+
+        <!-- =========================================
+     MODAL AGREGAR AMIGO
+========================================= -->
+
+<div
+    class="friend-modal-overlay"
+    id="friendModal"
+    style="display: none;"
+>
+
+    <div class="friend-modal">
+
+        <div class="friend-modal-header">
+
+            <div>
+                <h2>💚 Agregar amigo</h2>
+                <p>Encuentra a tu gente en ReVibe.</p>
+            </div>
+
+            <button
+                type="button"
+                class="friend-modal-close"
+                id="closeFriendModal"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="friend-search">
+
+            <span>🔍</span>
+
+            <input
+                type="text"
+                id="friendSearchInput"
+                placeholder="Buscar por @usuario"
+                autocomplete="off"
+                maxlength="20"
+            >
+
+        </div>
+
+
+        <p class="friend-search-help">
+            Escribe al menos 3 caracteres.
+        </p>
+
+
+        <div
+            class="friend-search-results"
+            id="friendSearchResults"
+        >
+
+            <div class="friend-search-empty">
+                👥
+                <p>Busca a alguien para encontrarlo.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 
