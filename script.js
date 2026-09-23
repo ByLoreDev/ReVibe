@@ -2240,20 +2240,7 @@ function renderFriendsHome(
         return;
     }
 
-    // =========================================
-    // TÍTULO
-    // =========================================
-
-    const title =
-        document.createElement("div");
-
-    title.className =
-        "friends-loaded-title";
-
-    title.innerHTML =
-        "<h3>👥 Tus amigos</h3>";
-
-    friendsList.appendChild(title);
+ 
 
     // =========================================
     // TARJETAS
