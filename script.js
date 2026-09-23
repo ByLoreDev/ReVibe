@@ -1,10 +1,6 @@
 // =========================================
 // ReVibe 💚
-// Auth + Inicio + Perfil + Avatar
-// =========================================
-
-// =========================================
-// SUPABASE
+// Auth + Inicio + Perfil + Avatar + Amigos
 // =========================================
 
 const SUPABASE_URL =
@@ -24,26 +20,13 @@ const supabaseClient =
 // ELEMENTOS - LOGIN
 // =========================================
 
-const loginForm =
-    document.getElementById("loginForm");
-
-const registerButton =
-    document.getElementById("registerButton");
-
-const googleButton =
-    document.querySelector(".google-button");
-
-const facebookButton =
-    document.querySelector(".facebook-button");
-
-const emailInput =
-    document.getElementById("email");
-
-const passwordInput =
-    document.getElementById("password");
-
-const authCard =
-    document.querySelector(".auth-card");
+const loginForm = document.getElementById("loginForm");
+const registerButton = document.getElementById("registerButton");
+const googleButton = document.querySelector(".google-button");
+const facebookButton = document.querySelector(".facebook-button");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const authCard = document.querySelector(".auth-card");
 
 
 // =========================================
@@ -77,7 +60,7 @@ const homeNowPlaying =
 const editProfileButton =
     document.getElementById("editProfileButton");
 
-    const profileMenuButton =
+const profileMenuButton =
     document.getElementById("profileMenuButton");
 
 const profileMenu =
@@ -149,14 +132,37 @@ const avatarLetter =
 
 
 // =========================================
+// ELEMENTOS - MODAL AMIGOS
+// =========================================
+
+const friendModal =
+    document.getElementById("friendModal");
+
+const closeFriendModal =
+    document.getElementById("closeFriendModal");
+
+const friendSearchInput =
+    document.getElementById("friendSearchInput");
+
+const friendSearchResults =
+    document.getElementById("friendSearchResults");
+
+
+// =========================================
 // ESTADO
 // =========================================
 
 let registerMode = false;
 
+let searchTimeout = null;
+
+let currentUserId = null;
+
+let currentProfile = null;
+
 
 // =========================================
-// MOSTRAR LOGIN
+// MOSTRAR PANTALLAS
 // =========================================
 
 function showLogin() {
@@ -175,10 +181,6 @@ function showLogin() {
 }
 
 
-// =========================================
-// MOSTRAR INICIO
-// =========================================
-
 function showHome() {
 
     if (authCard) {
@@ -192,12 +194,10 @@ function showHome() {
     if (homeSection) {
         homeSection.style.display = "block";
     }
+
+    loadFriends();
 }
 
-
-// =========================================
-// MOSTRAR PERFIL
-// =========================================
 
 function showProfile() {
 
@@ -216,51 +216,71 @@ function showProfile() {
 
 
 // =========================================
-// CREAR CUENTA / CAMBIAR LOGIN
+// REGISTRO / LOGIN
 // =========================================
 
-if (registerButton) {
+if (registerButton && loginForm) {
 
     registerButton.addEventListener(
         "click",
         function () {
 
-            registerMode = !registerMode;
+            registerMode =
+                !registerMode;
 
             const title =
-                document.querySelector(".auth-card h2");
+                document.querySelector(
+                    ".auth-card h2"
+                );
 
             const subtitle =
-                document.querySelector(".auth-subtitle");
+                document.querySelector(
+                    ".auth-subtitle"
+                );
 
             const submitButton =
-                loginForm.querySelector(".primary-button");
+                loginForm.querySelector(
+                    ".primary-button"
+                );
 
 
             if (registerMode) {
 
-                title.textContent =
-                    "¡Únete a ReVibe! 💚";
+                if (title) {
+                    title.textContent =
+                        "¡Únete a ReVibe! 💚";
+                }
 
-                subtitle.textContent =
-                    "Crea tu cuenta y empieza a conectar.";
+                if (subtitle) {
+                    subtitle.textContent =
+                        "Crea tu cuenta y empieza a conectar.";
+                }
 
-                submitButton.textContent =
-                    "CREAR CUENTA";
+                if (submitButton) {
+                    submitButton.textContent =
+                        "CREAR CUENTA";
+                }
 
                 registerButton.textContent =
                     "Ya tengo una cuenta";
 
+
             } else {
 
-                title.textContent =
-                    "¡Qué bueno verte! 💚";
+                if (title) {
+                    title.textContent =
+                        "¡Qué bueno verte! 💚";
+                }
 
-                subtitle.textContent =
-                    "Conecta con tus personas y vuelve a sentir la vibra.";
+                if (subtitle) {
+                    subtitle.textContent =
+                        "Conecta con tus personas y vuelve a sentir la vibra.";
+                }
 
-                submitButton.textContent =
-                    "ENTRAR";
+                if (submitButton) {
+                    submitButton.textContent =
+                        "ENTRAR";
+                }
 
                 registerButton.textContent =
                     "Crear cuenta";
@@ -268,7 +288,6 @@ if (registerButton) {
 
         }
     );
-
 }
 
 
@@ -284,11 +303,12 @@ if (loginForm) {
 
             event.preventDefault();
 
+
             const email =
-                emailInput.value.trim();
+                emailInput?.value.trim();
 
             const password =
-                passwordInput.value.trim();
+                passwordInput?.value.trim();
 
 
             if (!email || !password) {
@@ -312,30 +332,73 @@ if (loginForm) {
 
 
             const submitButton =
-                loginForm.querySelector(".primary-button");
+                loginForm.querySelector(
+                    ".primary-button"
+                );
 
-            submitButton.disabled = true;
+
+            if (submitButton) {
+                submitButton.disabled = true;
+            }
 
 
             try {
 
-                // =================================
+                // =============================
                 // CREAR CUENTA
-                // =================================
+                // =============================
 
                 if (registerMode) {
 
                     const {
                         data,
                         error
-                    } = await supabaseClient.auth.signUp({
-                        email,
-                        password
-                    });
+                    } =
+                        await supabaseClient
+                            .auth
+                            .signUp({
+                                email,
+                                password
+                            });
 
 
                     if (error) {
                         throw error;
+                    }
+
+
+                    registerMode = false;
+
+
+                    const title =
+                        document.querySelector(
+                            ".auth-card h2"
+                        );
+
+                    const subtitle =
+                        document.querySelector(
+                            ".auth-subtitle"
+                        );
+
+
+                    if (title) {
+                        title.textContent =
+                            "¡Qué bueno verte! 💚";
+                    }
+
+                    if (subtitle) {
+                        subtitle.textContent =
+                            "Conecta con tus personas y vuelve a sentir la vibra.";
+                    }
+
+                    if (submitButton) {
+                        submitButton.textContent =
+                            "ENTRAR";
+                    }
+
+                    if (registerButton) {
+                        registerButton.textContent =
+                            "Crear cuenta";
                     }
 
 
@@ -357,44 +420,24 @@ if (loginForm) {
                     }
 
 
-                    registerMode = false;
-
-
-                    const title =
-                        document.querySelector(".auth-card h2");
-
-                    const subtitle =
-                        document.querySelector(".auth-subtitle");
-
-
-                    title.textContent =
-                        "¡Qué bueno verte! 💚";
-
-                    subtitle.textContent =
-                        "Conecta con tus personas y vuelve a sentir la vibra.";
-
-                    submitButton.textContent =
-                        "ENTRAR";
-
-                    registerButton.textContent =
-                        "Crear cuenta";
-
-
                     return;
                 }
 
 
-                // =================================
+                // =============================
                 // LOGIN
-                // =================================
+                // =============================
 
                 const {
                     data,
                     error
-                } = await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
-                });
+                } =
+                    await supabaseClient
+                        .auth
+                        .signInWithPassword({
+                            email,
+                            password
+                        });
 
 
                 if (error) {
@@ -410,6 +453,7 @@ if (loginForm) {
 
                 await loadProfile();
 
+
             } catch (error) {
 
                 console.error(
@@ -423,15 +467,17 @@ if (loginForm) {
                     getAuthErrorMessage(error)
                 );
 
+
             } finally {
 
-                submitButton.disabled = false;
+                if (submitButton) {
+                    submitButton.disabled = false;
+                }
 
             }
 
         }
     );
-
 }
 
 
@@ -441,13 +487,18 @@ if (loginForm) {
 
 async function loadProfile() {
 
-    console.log("💚 Cargando perfil...");
+    console.log(
+        "💚 Cargando perfil..."
+    );
 
 
     const {
         data: sessionData,
         error: sessionError
-    } = await supabaseClient.auth.getSession();
+    } =
+        await supabaseClient
+            .auth
+            .getSession();
 
 
     if (sessionError) {
@@ -469,9 +520,9 @@ async function loadProfile() {
 
     if (!session) {
 
-        console.log(
-            "⚠️ No hay sesión activa."
-        );
+        currentUserId = null;
+
+        currentProfile = null;
 
         showLogin();
 
@@ -483,32 +534,30 @@ async function loadProfile() {
         session.user;
 
 
-    console.log(
-        "👤 Usuario:",
-        user.id
-    );
+    currentUserId =
+        user.id;
 
-
-    // =========================================
-    // BUSCAR PERFIL
-    // =========================================
 
     let {
         data: profile,
         error
-    } = await supabaseClient
-        .from("profiles")
-        .select(`
-            id,
-            username,
-            display_name,
-            avatar_url,
-            status,
-            personal_message,
-            now_playing
-        `)
-        .eq("id", user.id)
-        .maybeSingle();
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select(`
+                id,
+                username,
+                display_name,
+                avatar_url,
+                status,
+                personal_message,
+                now_playing
+            `)
+            .eq(
+                "id",
+                user.id
+            )
+            .maybeSingle();
 
 
     if (error) {
@@ -528,15 +577,10 @@ async function loadProfile() {
 
 
     // =========================================
-    // SI NO EXISTE PERFIL
+    // CREAR PERFIL SI NO EXISTE
     // =========================================
 
     if (!profile) {
-
-        console.log(
-            "⚠️ No existe perfil. Creándolo..."
-        );
-
 
         const defaultName =
             user.user_metadata?.name ||
@@ -547,15 +591,18 @@ async function loadProfile() {
         const {
             data: newProfile,
             error: createError
-        } = await supabaseClient
-            .from("profiles")
-            .insert({
-                id: user.id,
-                display_name: defaultName,
-                status: "online"
-            })
-            .select()
-            .single();
+        } =
+            await supabaseClient
+                .from("profiles")
+                .insert({
+                    id: user.id,
+                    display_name:
+                        defaultName,
+                    status:
+                        "online"
+                })
+                .select()
+                .single();
 
 
         if (createError) {
@@ -579,47 +626,57 @@ async function loadProfile() {
     }
 
 
+    currentProfile =
+        profile;
+
+
     // =========================================
-    // FORMULARIO
+    // CARGAR FORMULARIO
     // =========================================
 
     if (displayNameInput) {
+
         displayNameInput.value =
             profile.display_name || "";
     }
 
 
     if (usernameInput) {
+
         usernameInput.value =
             profile.username || "";
     }
 
 
     if (personalMessageInput) {
+
         personalMessageInput.value =
             profile.personal_message || "";
     }
 
 
     if (statusInput) {
+
         statusInput.value =
             profile.status || "online";
     }
 
 
     if (nowPlayingInput) {
+
         nowPlayingInput.value =
             profile.now_playing || "";
     }
 
 
     // =========================================
-    // AVATAR DEL PERFIL
+    // CARGAR AVATAR
     // =========================================
 
     if (profile.avatar_url) {
 
         if (avatarImage) {
+
             avatarImage.src =
                 profile.avatar_url;
 
@@ -627,19 +684,25 @@ async function loadProfile() {
                 "block";
         }
 
+
         if (avatarLetter) {
+
             avatarLetter.style.display =
                 "none";
         }
 
+
     } else {
 
         if (avatarImage) {
+
             avatarImage.style.display =
                 "none";
         }
 
+
         if (avatarLetter) {
+
             avatarLetter.style.display =
                 "block";
         }
@@ -650,7 +713,9 @@ async function loadProfile() {
     // ACTUALIZAR INICIO
     // =========================================
 
-    updateHomeProfile(profile);
+    updateHomeProfile(
+        profile
+    );
 
 
     console.log(
@@ -666,16 +731,14 @@ async function loadProfile() {
 // ACTUALIZAR PERFIL EN INICIO
 // =========================================
 
-function updateHomeProfile(profile) {
+function updateHomeProfile(
+    profile
+) {
 
     if (!profile) {
         return;
     }
 
-
-    // =========================================
-    // NOMBRE
-    // =========================================
 
     if (homeDisplayName) {
 
@@ -684,10 +747,6 @@ function updateHomeProfile(profile) {
             "ReViber";
     }
 
-
-    // =========================================
-    // USERNAME
-    // =========================================
 
     if (homeUsername) {
 
@@ -698,22 +757,15 @@ function updateHomeProfile(profile) {
     }
 
 
-    // =========================================
-    // MENSAJE
-    // =========================================
-
     if (homePersonalMessage) {
 
         homePersonalMessage.textContent =
             profile.personal_message
-                ? "💭 " + profile.personal_message
+                ? "💭 " +
+                  profile.personal_message
                 : "💭 Sin mensaje personal";
     }
 
-
-    // =========================================
-    // NOW PLAYING
-    // =========================================
 
     if (homeNowPlaying) {
 
@@ -723,18 +775,11 @@ function updateHomeProfile(profile) {
     }
 
 
-    // =========================================
-    // ESTADO
-    // =========================================
-
     updateStatusDot(
-        profile.status || "online"
+        profile.status ||
+        "online"
     );
 
-
-    // =========================================
-    // AVATAR
-    // =========================================
 
     updateHomeAvatar(
         profile.avatar_url,
@@ -744,10 +789,12 @@ function updateHomeProfile(profile) {
 
 
 // =========================================
-// ACTUALIZAR PUNTO DE ESTADO
+// ESTADO
 // =========================================
 
-function updateStatusDot(status) {
+function updateStatusDot(
+    status
+) {
 
     if (!homeStatusDot) {
         return;
@@ -772,22 +819,23 @@ function updateStatusDot(status) {
 }
 
 
-// =========================================
-// TEXTO DEL ESTADO
-// =========================================
-
-function getStatusText(status) {
+function getStatusText(
+    status
+) {
 
     const statuses = {
 
-        online: "Conectada",
+        online:
+            "Conectada",
 
-        away: "Ausente",
+        away:
+            "Ausente",
 
-        busy: "Ocupada",
+        busy:
+            "Ocupada",
 
-        offline: "Desconectada"
-
+        offline:
+            "Desconectada"
     };
 
 
@@ -797,7 +845,7 @@ function getStatusText(status) {
 
 
 // =========================================
-// ACTUALIZAR AVATAR EN INICIO
+// AVATAR EN INICIO
 // =========================================
 
 function updateHomeAvatar(
@@ -826,11 +874,13 @@ function updateHomeAvatar(
                 "block";
         }
 
+
         if (homeAvatarPlaceholder) {
 
             homeAvatarPlaceholder.style.display =
                 "none";
         }
+
 
     } else {
 
@@ -839,6 +889,7 @@ function updateHomeAvatar(
             homeAvatar.style.display =
                 "none";
         }
+
 
         if (homeAvatarPlaceholder) {
 
@@ -850,11 +901,6 @@ function updateHomeAvatar(
         }
     }
 }
-
-
-// =========================================
-// BOTÓN EDITAR PERFIL
-// =========================================
 
 // =========================================
 // MENÚ DEL PERFIL
@@ -868,14 +914,18 @@ if (profileMenuButton && profileMenu) {
 
             event.stopPropagation();
 
-            profileMenu.classList.toggle("active");
+            profileMenu.classList.toggle(
+                "active"
+            );
 
         }
     );
 }
 
 
-// Cerrar menú al hacer clic fuera
+// =========================================
+// CERRAR MENÚ AL HACER CLIC AFUERA
+// =========================================
 
 document.addEventListener(
     "click",
@@ -883,11 +933,18 @@ document.addEventListener(
 
         if (
             profileMenu &&
-            !profileMenu.contains(event.target) &&
-            !profileMenuButton.contains(event.target)
+            profileMenuButton &&
+            !profileMenu.contains(
+                event.target
+            ) &&
+            !profileMenuButton.contains(
+                event.target
+            )
         ) {
 
-            profileMenu.classList.remove("active");
+            profileMenu.classList.remove(
+                "active"
+            );
 
         }
 
@@ -918,7 +975,13 @@ if (menuEditProfile) {
         "click",
         function () {
 
-            profileMenu.classList.remove("active");
+            if (profileMenu) {
+
+                profileMenu.classList.remove(
+                    "active"
+                );
+            }
+
 
             showProfile();
 
@@ -952,7 +1015,10 @@ if (menuSignOut) {
 
                 const {
                     error
-                } = await supabaseClient.auth.signOut();
+                } =
+                    await supabaseClient
+                        .auth
+                        .signOut();
 
 
                 if (error) {
@@ -960,19 +1026,27 @@ if (menuSignOut) {
                 }
 
 
-                profileMenu.classList.remove(
-                    "active"
-                );
+                currentUserId =
+                    null;
+
+                currentProfile =
+                    null;
 
 
-                showLogin();
+                if (profileMenu) {
 
+                    profileMenu.classList.remove(
+                        "active"
+                    );
+                }
 
-                // Limpiar formularios
 
                 if (loginForm) {
                     loginForm.reset();
                 }
+
+
+                showLogin();
 
 
                 console.log(
@@ -1001,7 +1075,7 @@ if (menuSignOut) {
 
 
 // =========================================
-// BOTÓN VOLVER A INICIO
+// VOLVER A INICIO DESDE PERFIL
 // =========================================
 
 if (backToHome) {
@@ -1018,41 +1092,2309 @@ if (backToHome) {
 
 
 // =========================================
-// AGREGAR AMIGO
+// MODAL AGREGAR AMIGO
 // =========================================
 
-function comingSoonFriends() {
+function openFriendModal() {
 
-    alert(
-        "👥 ¡Muy pronto!\n\n" +
-        "Aquí podrás buscar personas por su @usuario y agregarlas a tus amigos. 💚"
-    );
+    if (!friendModal) {
+        return;
+    }
+
+
+    friendModal.style.display =
+        "flex";
+
+
+    if (friendSearchInput) {
+
+        friendSearchInput.value =
+            "";
+
+        setTimeout(
+            function () {
+
+                friendSearchInput.focus();
+
+            },
+            50
+        );
+    }
+
+
+    if (friendSearchResults) {
+
+        friendSearchResults.innerHTML = `
+            <div class="friend-search-empty">
+                👥
+                <p>
+                    Busca a alguien para encontrarlo.
+                </p>
+            </div>
+        `;
+
+    }
+
 }
 
+
+function closeFriendModalWindow() {
+
+    if (!friendModal) {
+        return;
+    }
+
+
+    friendModal.style.display =
+        "none";
+
+
+    if (friendSearchInput) {
+
+        friendSearchInput.value =
+            "";
+    }
+
+}
+
+
+// =========================================
+// BOTÓN + AGREGAR
+// =========================================
 
 if (addFriendButton) {
 
     addFriendButton.addEventListener(
         "click",
-        comingSoonFriends
+        function () {
+
+            openFriendModal();
+
+        }
     );
 }
 
+
+// =========================================
+// BOTÓN AGREGAR PRIMER AMIGO
+// =========================================
 
 if (addFirstFriendButton) {
 
     addFirstFriendButton.addEventListener(
         "click",
-        comingSoonFriends
+        function () {
+
+            openFriendModal();
+
+        }
     );
 }
 
 
 // =========================================
-// FOTO DE PERFIL
+// CERRAR MODAL CON X
 // =========================================
 
-if (avatarEdit && avatarInput) {
+if (closeFriendModal) {
+
+    closeFriendModal.addEventListener(
+        "click",
+        function () {
+
+            closeFriendModalWindow();
+
+        }
+    );
+}
+
+
+// =========================================
+// CERRAR AL HACER CLIC FUERA
+// =========================================
+
+if (friendModal) {
+
+    friendModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                friendModal
+            ) {
+
+                closeFriendModalWindow();
+
+            }
+
+        }
+    );
+}
+
+
+// =========================================
+// CERRAR CON ESC
+// =========================================
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Escape" &&
+            friendModal &&
+            friendModal.style.display !== "none"
+        ) {
+
+            closeFriendModalWindow();
+
+        }
+
+    }
+);
+
+
+// =========================================
+// BUSCAR USUARIOS
+// =========================================
+
+if (friendSearchInput) {
+
+    friendSearchInput.addEventListener(
+        "input",
+        function () {
+
+            clearTimeout(
+                searchTimeout
+            );
+
+
+            const search =
+                friendSearchInput.value
+                    .trim()
+                    .toLowerCase()
+                    .replace(
+                        /^@/,
+                        ""
+                    );
+
+
+            if (
+                search.length < 3
+            ) {
+
+                if (friendSearchResults) {
+
+                    friendSearchResults.innerHTML = `
+                        <div class="friend-search-empty">
+                            👥
+                            <p>
+                                Escribe al menos 3 caracteres.
+                            </p>
+                        </div>
+                    `;
+
+                }
+
+                return;
+            }
+
+
+            if (friendSearchResults) {
+
+                friendSearchResults.innerHTML = `
+                    <div class="friend-search-empty">
+                        🔍
+                        <p>Buscando...</p>
+                    </div>
+                `;
+
+            }
+
+
+            searchTimeout =
+                setTimeout(
+                    function () {
+
+                        searchUsers(
+                            search
+                        );
+
+                    },
+                    350
+                );
+
+        }
+    );
+}
+
+// =========================================
+// SOLICITUDES DE AMISTAD
+// =========================================
+
+async function loadFriendRequests() {
+
+    if (!currentUserId) {
+        return;
+    }
+
+    try {
+
+        const {
+            data: requests,
+            error
+        } = await supabaseClient
+            .from("friendships")
+            .select(`
+                id,
+                requester_id,
+                receiver_id,
+                status,
+                created_at
+            `)
+            .eq("receiver_id", currentUserId)
+            .eq("status", "pending")
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        let requestsContainer =
+            document.getElementById(
+                "friendRequestsContainer"
+            );
+
+        if (!requestsContainer) {
+
+            requestsContainer =
+                document.createElement("div");
+
+            requestsContainer.id =
+                "friendRequestsContainer";
+
+            requestsContainer.className =
+                "friend-requests-container";
+
+            if (friendsList) {
+
+                friendsList.parentNode.insertBefore(
+                    requestsContainer,
+                    friendsList
+                );
+
+            }
+        }
+
+        if (!requests || requests.length === 0) {
+
+            requestsContainer.style.display =
+                "none";
+
+            return;
+        }
+
+        requestsContainer.style.display =
+            "block";
+
+        requestsContainer.innerHTML = `
+            <div class="friend-requests-header">
+
+                <div>
+                    <h3>💌 Solicitudes de amistad</h3>
+
+                    <span>
+                        ${requests.length}
+                        ${requests.length === 1
+                            ? "solicitud pendiente"
+                            : "solicitudes pendientes"}
+                    </span>
+                </div>
+
+            </div>
+
+            <div
+                class="friend-requests-list"
+                id="friendRequestsList"
+            ></div>
+        `;
+
+        const requestsList =
+            document.getElementById(
+                "friendRequestsList"
+            );
+
+        const requesterIds =
+            requests.map(
+                request =>
+                    request.requester_id
+            );
+
+        const {
+            data: profiles,
+            error: profilesError
+        } =
+            await supabaseClient
+                .from("profiles")
+                .select(`
+                    id,
+                    username,
+                    display_name,
+                    avatar_url,
+                    status
+                `)
+                .in(
+                    "id",
+                    requesterIds
+                );
+
+        if (profilesError) {
+            throw profilesError;
+        }
+
+        requests.forEach(request => {
+
+            const person =
+                profiles.find(
+                    profile =>
+                        profile.id ===
+                        request.requester_id
+                );
+
+            if (!person) {
+                return;
+            }
+
+            const card =
+                createFriendRequestCard(
+                    request,
+                    person
+                );
+
+            requestsList.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error cargando solicitudes:",
+            error
+        );
+
+    }
+
+}
+// =========================================
+// CONSULTAR USUARIOS EN SUPABASE
+// =========================================
+
+async function searchUsers(
+    search
+) {
+
+    try {
+
+        const {
+            data: sessionData,
+            error: sessionError
+        } =
+            await supabaseClient
+                .auth
+                .getSession();
+
+
+        if (
+            sessionError ||
+            !sessionData.session
+        ) {
+
+            throw new Error(
+                "Tu sesión ya no está activa."
+            );
+        }
+
+
+        const currentUser =
+            sessionData.session.user;
+
+
+        const {
+            data: users,
+            error
+        } =
+            await supabaseClient
+                .from("profiles")
+                .select(`
+                    id,
+                    username,
+                    display_name,
+                    avatar_url,
+                    status
+                `)
+                .ilike(
+                    "username",
+                    `${search}%`
+                )
+                .neq(
+                    "id",
+                    currentUser.id
+                )
+                .limit(10);
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (
+            !users ||
+            users.length === 0
+        ) {
+
+            if (friendSearchResults) {
+
+                friendSearchResults.innerHTML = `
+                    <div class="friend-search-empty">
+                        😕
+                        <p>
+                            No encontramos a nadie con
+                            <strong>@${escapeHtml(search)}</strong>
+                        </p>
+                    </div>
+                `;
+
+            }
+
+            return;
+        }
+
+
+        await renderFriendResults(
+            users
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error buscando usuarios:",
+            error
+        );
+
+
+        if (friendSearchResults) {
+
+            friendSearchResults.innerHTML = `
+                <div class="friend-search-empty">
+                    ⚠️
+                    <p>
+                        No pudimos realizar la búsqueda.
+                    </p>
+                </div>
+            `;
+
+        }
+
+    }
+
+}
+
+
+// =========================================
+// MOSTRAR RESULTADOS
+// =========================================
+
+async function renderFriendResults(
+    users
+) {
+
+    if (!friendSearchResults) {
+        return;
+    }
+
+
+    friendSearchResults.innerHTML =
+        "";
+
+
+    for (
+        const user of users
+    ) {
+
+        const relation =
+            await getFriendshipStatus(
+                user.id
+            );
+
+
+        const result =
+            document.createElement(
+                "div"
+            );
+
+
+        result.className =
+            "friend-result";
+
+
+        const avatar =
+            document.createElement(
+                "div"
+            );
+
+
+        avatar.className =
+            "friend-result-avatar";
+
+
+        if (user.avatar_url) {
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+            img.src =
+                user.avatar_url;
+
+            img.alt =
+                user.display_name ||
+                "Usuario";
+
+
+            avatar.appendChild(
+                img
+            );
+
+        } else {
+
+            avatar.textContent =
+                (
+                    user.display_name ||
+                    user.username ||
+                    "R"
+                )
+                .charAt(0)
+                .toUpperCase();
+
+        }
+
+
+        const info =
+            document.createElement(
+                "div"
+            );
+
+
+        info.className =
+            "friend-result-info";
+
+
+        const name =
+            document.createElement(
+                "p"
+            );
+
+
+        name.className =
+            "friend-result-name";
+
+
+        name.textContent =
+            user.display_name ||
+            "ReViber";
+
+
+        const username =
+            document.createElement(
+                "p"
+            );
+
+
+        username.className =
+            "friend-result-username";
+
+
+        username.textContent =
+            user.username
+                ? "@" + user.username
+                : "@usuario";
+
+
+        info.appendChild(
+            name
+        );
+
+        info.appendChild(
+            username
+        );
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.type =
+            "button";
+
+
+        button.className =
+            "friend-result-button";
+
+
+        if (
+            relation ===
+            "accepted"
+        ) {
+
+            button.textContent =
+                "✓ Amigos";
+
+            button.classList.add(
+                "friend"
+            );
+
+            button.disabled =
+                true;
+
+
+        } else if (
+            relation ===
+            "pending_sent"
+        ) {
+
+            button.textContent =
+                "Solicitud enviada";
+
+            button.classList.add(
+                "pending"
+            );
+
+            button.disabled =
+                true;
+
+
+        } else if (
+            relation ===
+            "pending_received"
+        ) {
+
+            button.textContent =
+                "💌 Solicitud recibida";
+
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    acceptFriendRequest(
+                        user.id
+                    );
+
+                }
+            );
+
+
+        } else {
+
+            button.textContent =
+                "+ Agregar";
+
+
+            button.addEventListener(
+                "click",
+                async function () {
+
+                    button.disabled =
+                        true;
+
+                    button.textContent =
+                        "Enviando...";
+
+
+                    const success =
+                        await sendFriendRequest(
+                            user.id
+                        );
+
+
+                    if (success) {
+
+                        button.textContent =
+                            "Solicitud enviada";
+
+                        button.classList.add(
+                            "pending"
+                        );
+
+                    } else {
+
+                        button.disabled =
+                            false;
+
+                        button.textContent =
+                            "+ Agregar";
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        result.appendChild(
+            avatar
+        );
+
+        result.appendChild(
+            info
+        );
+
+        result.appendChild(
+            button
+        );
+
+
+        friendSearchResults.appendChild(
+            result
+        );
+
+    }
+
+}
+// =========================================
+// ENVIAR SOLICITUD DE AMISTAD
+// =========================================
+
+async function sendFriendRequest(receiverId) {
+
+    if (!currentUserId) {
+
+        alert(
+            "⚠️ Tu sesión ya no está activa."
+        );
+
+        return false;
+    }
+
+    if (
+        receiverId === currentUserId
+    ) {
+
+        return false;
+    }
+
+    try {
+
+        console.log(
+            "👥 Enviando solicitud...",
+            {
+                requester_id:
+                    currentUserId,
+
+                receiver_id:
+                    receiverId
+            }
+        );
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("friendships")
+                .insert({
+                    requester_id:
+                        currentUserId,
+
+                    receiver_id:
+                        receiverId,
+
+                    status:
+                        "pending"
+                })
+                .select()
+                .single();
+
+
+        if (error) {
+
+            console.error(
+                "❌ Error de Supabase:",
+                error
+            );
+
+            throw error;
+        }
+
+
+        console.log(
+            "💚 Solicitud creada:",
+            data
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ No se pudo enviar la solicitud:",
+            error
+        );
+
+
+        if (
+            error.code === "23505"
+        ) {
+
+            alert(
+                "💚 Ya existe una solicitud o amistad con esta persona."
+            );
+
+        } else {
+
+            alert(
+                "⚠️ No pudimos enviar la solicitud.\n\n" +
+                error.message
+            );
+
+        }
+
+
+        return false;
+    }
+}
+
+// =========================================
+// CARGAR AMIGOS
+// =========================================
+
+async function loadFriends() {
+
+    if (!friendsList) return;
+
+    try {
+
+        const {
+            data: sessionData,
+            error: sessionError
+        } = await supabaseClient.auth.getSession();
+
+        if (sessionError) {
+            throw sessionError;
+        }
+
+        if (!sessionData.session) {
+            console.log("⚠️ No hay sesión activa.");
+            return;
+        }
+
+        currentUserId =
+            sessionData.session.user.id;
+
+        console.log(
+            "👤 Usuario actual:",
+            currentUserId
+        );
+
+        const {
+            data: relationships,
+            error
+        } = await supabaseClient
+            .from("friendships")
+            .select(`
+                id,
+                requester_id,
+                receiver_id,
+                status,
+                created_at
+            `)
+            .or(
+                `requester_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`
+            )
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        console.log(
+            "💚 Relaciones:",
+            relationships
+        );
+
+        // Amigos aceptados
+        const accepted =
+            (relationships || []).filter(
+                friendship =>
+                    friendship.status === "accepted"
+            );
+
+        // Solicitudes recibidas
+        const received =
+            (relationships || []).filter(
+                friendship =>
+                    friendship.status === "pending" &&
+                    friendship.receiver_id === currentUserId
+            );
+
+        // IDs de las otras personas
+        const otherIds = [
+            ...accepted.map(friendship =>
+                friendship.requester_id === currentUserId
+                    ? friendship.receiver_id
+                    : friendship.requester_id
+            ),
+
+            ...received.map(
+                friendship =>
+                    friendship.requester_id
+            )
+        ];
+
+        const uniqueIds = [
+            ...new Set(otherIds)
+        ];
+
+        let profiles = [];
+
+        if (uniqueIds.length > 0) {
+
+            const {
+                data,
+                error: profilesError
+            } = await supabaseClient
+                .from("profiles")
+                .select(`
+                    id,
+                    username,
+                    display_name,
+                    avatar_url,
+                    status,
+                    personal_message,
+                    now_playing
+                `)
+                .in("id", uniqueIds);
+
+            if (profilesError) {
+                throw profilesError;
+            }
+
+            profiles = data || [];
+        }
+
+        renderFriendsHome(
+            accepted,
+            received,
+            profiles
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error cargando amigos:",
+            error
+        );
+
+        friendsList.innerHTML = `
+            <div class="friend-search-empty">
+                ⚠️
+                <p>No pudimos cargar tus amigos.</p>
+                <small>
+                    ${escapeHtml(
+                        error.message ||
+                        "Error desconocido"
+                    )}
+                </small>
+            </div>
+        `;
+    }
+}
+
+
+// =========================================
+// MOSTRAR AMIGOS EN INICIO
+// =========================================
+
+function renderFriendsHome(
+    accepted,
+    received,
+    profiles
+) {
+
+    if (!friendsList) return;
+
+    friendsList.innerHTML = "";
+
+    // =========================================
+    // SOLICITUDES RECIBIDAS
+    // =========================================
+
+    if (received.length > 0) {
+
+        const requestsBox =
+            document.createElement("div");
+
+        requestsBox.className =
+            "friend-requests-box";
+
+        const title =
+            document.createElement("h3");
+
+        title.textContent =
+            `💌 Solicitudes (${received.length})`;
+
+        requestsBox.appendChild(title);
+
+        received.forEach(request => {
+
+            const person =
+                profiles.find(
+                    profile =>
+                        profile.id ===
+                        request.requester_id
+                );
+
+            if (!person) return;
+
+            const requestCard =
+                createFriendRequestCard(
+                    request,
+                    person
+                );
+
+            requestsBox.appendChild(
+                requestCard
+            );
+        });
+
+        friendsList.appendChild(
+            requestsBox
+        );
+    }
+
+    // =========================================
+    // SI NO TIENE AMIGOS
+    // =========================================
+
+    if (accepted.length === 0) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "empty-friends";
+
+        empty.innerHTML = `
+            <div class="empty-friends-icon">
+                👥
+            </div>
+
+            <h3>
+                Aún no tienes amigos
+            </h3>
+
+            <p>
+                Agrega a alguien y empieza
+                a crear tu vibra. ✨
+            </p>
+
+            <button
+                type="button"
+                class="primary-button"
+                id="dynamicAddFriendButton"
+            >
+                💚 AGREGAR MI PRIMER AMIGO
+            </button>
+        `;
+
+        const button =
+            empty.querySelector(
+                "#dynamicAddFriendButton"
+            );
+
+        if (button) {
+            button.addEventListener(
+                "click",
+                openFriendModal
+            );
+        }
+
+        friendsList.appendChild(
+            empty
+        );
+
+        return;
+    }
+
+    // =========================================
+    // TÍTULO
+    // =========================================
+
+    const title =
+        document.createElement("div");
+
+    title.className =
+        "friends-loaded-title";
+
+    title.innerHTML =
+        "<h3>👥 Tus amigos</h3>";
+
+    friendsList.appendChild(title);
+
+    // =========================================
+    // TARJETAS
+    // =========================================
+
+    accepted.forEach(friendship => {
+
+        const friendId =
+            friendship.requester_id === currentUserId
+                ? friendship.receiver_id
+                : friendship.requester_id;
+
+        const person =
+            profiles.find(
+                profile =>
+                    profile.id === friendId
+            );
+
+        if (!person) return;
+
+        friendsList.appendChild(
+            createFriendCard(
+                person,
+                friendship
+            )
+        );
+    });
+}
+
+
+// =========================================
+// TARJETA DE SOLICITUD
+// =========================================
+
+function createFriendRequestCard(
+    request,
+    person
+) {
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "friend-request-row";
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "friend-result-avatar";
+
+    if (person.avatar_url) {
+
+        const img =
+            document.createElement("img");
+
+        img.src =
+            person.avatar_url;
+
+        img.alt =
+            "Foto de " +
+            (person.display_name || "usuario");
+
+        avatar.appendChild(img);
+
+    } else {
+
+        avatar.textContent =
+            (
+                person.display_name ||
+                person.username ||
+                "R"
+            )
+                .charAt(0)
+                .toUpperCase();
+    }
+
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "friend-result-info";
+
+    const name =
+        document.createElement("p");
+
+    name.className =
+        "friend-result-name";
+
+    name.textContent =
+        person.display_name ||
+        "ReViber";
+
+    const username =
+        document.createElement("p");
+
+    username.className =
+        "friend-result-username";
+
+    username.textContent =
+        "@" +
+        (person.username || "usuario");
+
+    info.appendChild(name);
+    info.appendChild(username);
+
+    const actions =
+        document.createElement("div");
+
+    actions.className =
+        "friend-request-actions";
+
+    const accept =
+        document.createElement("button");
+
+    accept.type = "button";
+
+    accept.className =
+        "friend-result-button";
+
+    accept.textContent =
+        "✓ Aceptar";
+
+    accept.addEventListener(
+        "click",
+        async function () {
+
+            accept.disabled = true;
+
+            const success =
+                await updateFriendship(
+                    request.id,
+                    "accepted"
+                );
+
+            if (success) {
+                await loadFriends();
+            } else {
+                accept.disabled = false;
+            }
+        }
+    );
+
+    const reject =
+        document.createElement("button");
+
+    reject.type = "button";
+
+    reject.className =
+        "friend-result-button pending";
+
+    reject.textContent =
+        "✕ Rechazar";
+
+    reject.addEventListener(
+        "click",
+        async function () {
+
+            reject.disabled = true;
+
+            const success =
+                await updateFriendship(
+                    request.id,
+                    "rejected"
+                );
+
+            if (success) {
+                await loadFriends();
+            } else {
+                reject.disabled = false;
+            }
+        }
+    );
+
+    actions.appendChild(accept);
+    actions.appendChild(reject);
+
+    card.appendChild(avatar);
+    card.appendChild(info);
+    card.appendChild(actions);
+
+    return card;
+}
+// =========================================
+// CARGAR AMIGOS
+// =========================================
+
+async function loadFriends() {
+
+    if (!friendsList) return;
+
+    try {
+
+        const {
+            data: sessionData,
+            error: sessionError
+        } = await supabaseClient.auth.getSession();
+
+        if (sessionError) {
+            throw sessionError;
+        }
+
+        if (!sessionData.session) {
+            console.log("⚠️ No hay sesión activa.");
+            return;
+        }
+
+        currentUserId =
+            sessionData.session.user.id;
+
+        console.log(
+            "👤 Usuario actual:",
+            currentUserId
+        );
+
+        const {
+            data: relationships,
+            error
+        } = await supabaseClient
+            .from("friendships")
+            .select(`
+                id,
+                requester_id,
+                receiver_id,
+                status,
+                created_at
+            `)
+            .or(
+                `requester_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`
+            )
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const accepted =
+            (relationships || []).filter(
+                friendship =>
+                    friendship.status === "accepted"
+            );
+
+        const received =
+            (relationships || []).filter(
+                friendship =>
+                    friendship.status === "pending" &&
+                    friendship.receiver_id === currentUserId
+            );
+
+        const otherIds = [
+
+            ...accepted.map(friendship =>
+                friendship.requester_id === currentUserId
+                    ? friendship.receiver_id
+                    : friendship.requester_id
+            ),
+
+            ...received.map(
+                friendship =>
+                    friendship.requester_id
+            )
+        ];
+
+        const uniqueIds =
+            [...new Set(otherIds)];
+
+        let profiles = [];
+
+        if (uniqueIds.length > 0) {
+
+            const {
+                data,
+                error: profilesError
+            } = await supabaseClient
+                .from("profiles")
+                .select(`
+                    id,
+                    username,
+                    display_name,
+                    avatar_url,
+                    status,
+                    personal_message,
+                    now_playing
+                `)
+                .in("id", uniqueIds);
+
+            if (profilesError) {
+                throw profilesError;
+            }
+
+            profiles = data || [];
+        }
+
+        renderFriendsHome(
+            accepted,
+            received,
+            profiles
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error cargando amigos:",
+            error
+        );
+
+        friendsList.innerHTML = `
+            <div class="friend-search-empty">
+                ⚠️
+                <p>No pudimos cargar tus amigos.</p>
+                <small>
+                    ${escapeHtml(
+                        error.message ||
+                        "Error desconocido"
+                    )}
+                </small>
+            </div>
+        `;
+    }
+}
+
+
+// =========================================
+// MOSTRAR AMIGOS
+// =========================================
+
+function renderFriendsHome(
+    accepted,
+    received,
+    profiles
+) {
+
+    if (!friendsList) return;
+
+    friendsList.innerHTML = "";
+
+    // Solicitudes recibidas
+    if (received.length > 0) {
+
+        const requestsBox =
+            document.createElement("div");
+
+        requestsBox.className =
+            "friend-requests-box";
+
+        const title =
+            document.createElement("h3");
+
+        title.textContent =
+            `💌 Solicitudes (${received.length})`;
+
+        requestsBox.appendChild(title);
+
+        received.forEach(request => {
+
+            const person =
+                profiles.find(
+                    profile =>
+                        profile.id ===
+                        request.requester_id
+                );
+
+            if (!person) return;
+
+            requestsBox.appendChild(
+                createFriendRequestCard(
+                    request,
+                    person
+                )
+            );
+        });
+
+        friendsList.appendChild(
+            requestsBox
+        );
+    }
+
+    // Sin amigos
+    if (accepted.length === 0) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "empty-friends";
+
+        empty.innerHTML = `
+            <div class="empty-friends-icon">
+                👥
+            </div>
+
+            <h3>Aún no tienes amigos</h3>
+
+            <p>
+                Agrega a alguien y empieza
+                a crear tu vibra. ✨
+            </p>
+
+            <button
+                type="button"
+                class="primary-button"
+                id="dynamicAddFriendButton"
+            >
+                💚 AGREGAR MI PRIMER AMIGO
+            </button>
+        `;
+
+        const button =
+            empty.querySelector(
+                "#dynamicAddFriendButton"
+            );
+
+        if (button) {
+            button.addEventListener(
+                "click",
+                openFriendModal
+            );
+        }
+
+        friendsList.appendChild(empty);
+
+        return;
+    }
+
+    // Título de amigos
+    const title =
+        document.createElement("div");
+
+    title.className =
+        "friends-loaded-title";
+
+    title.innerHTML =
+        "<h3>👥 Tus amigos</h3>";
+
+    friendsList.appendChild(title);
+
+    // Mostrar amigos
+    accepted.forEach(friendship => {
+
+        const friendId =
+            friendship.requester_id === currentUserId
+                ? friendship.receiver_id
+                : friendship.requester_id;
+
+        const person =
+            profiles.find(
+                profile =>
+                    profile.id === friendId
+            );
+
+        if (!person) return;
+
+        friendsList.appendChild(
+            createFriendCard(
+                person,
+                friendship
+            )
+        );
+    });
+}
+
+
+// =========================================
+// TARJETA DE SOLICITUD
+// =========================================
+
+function createFriendRequestCard(
+    request,
+    person
+) {
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "friend-request-row";
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "friend-result-avatar";
+
+    if (person.avatar_url) {
+
+        const img =
+            document.createElement("img");
+
+        img.src =
+            person.avatar_url;
+
+        img.alt =
+            "Foto de " +
+            (person.display_name || "usuario");
+
+        avatar.appendChild(img);
+
+    } else {
+
+        avatar.textContent =
+            (
+                person.display_name ||
+                person.username ||
+                "R"
+            )
+                .charAt(0)
+                .toUpperCase();
+    }
+
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "friend-result-info";
+
+    const name =
+        document.createElement("p");
+
+    name.className =
+        "friend-result-name";
+
+    name.textContent =
+        person.display_name ||
+        "ReViber";
+
+    const username =
+        document.createElement("p");
+
+    username.className =
+        "friend-result-username";
+
+    username.textContent =
+        "@" +
+        (person.username || "usuario");
+
+    info.appendChild(name);
+    info.appendChild(username);
+
+    const actions =
+        document.createElement("div");
+
+    actions.className =
+        "friend-request-actions";
+
+    const accept =
+        document.createElement("button");
+
+    accept.type = "button";
+    accept.className =
+        "friend-result-button";
+    accept.textContent =
+        "✓ Aceptar";
+
+    accept.addEventListener(
+        "click",
+        async function () {
+
+            accept.disabled = true;
+
+            const success =
+                await updateFriendship(
+                    request.id,
+                    "accepted"
+                );
+
+            if (success) {
+                await loadFriends();
+            } else {
+                accept.disabled = false;
+            }
+        }
+    );
+
+    const reject =
+        document.createElement("button");
+
+    reject.type = "button";
+    reject.className =
+        "friend-result-button pending";
+    reject.textContent =
+        "✕ Rechazar";
+
+    reject.addEventListener(
+        "click",
+        async function () {
+
+            reject.disabled = true;
+
+            const success =
+                await updateFriendship(
+                    request.id,
+                    "rejected"
+                );
+
+            if (success) {
+                await loadFriends();
+            } else {
+                reject.disabled = false;
+            }
+        }
+    );
+
+    actions.appendChild(accept);
+    actions.appendChild(reject);
+
+    card.appendChild(avatar);
+    card.appendChild(info);
+    card.appendChild(actions);
+
+    return card;
+}
+// =========================================
+// ESTADO DE AMISTAD
+// =========================================
+
+async function getFriendshipStatus(
+    otherUserId
+) {
+
+    if (!currentUserId) {
+        return "none";
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("friendships")
+            .select(`
+                id,
+                requester_id,
+                receiver_id,
+                status
+            `)
+            .or(
+                `and(requester_id.eq.${currentUserId},receiver_id.eq.${otherUserId}),and(requester_id.eq.${otherUserId},receiver_id.eq.${currentUserId})`
+            )
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "❌ Error consultando amistad:",
+            error
+        );
+
+        return "none";
+    }
+
+
+    if (!data) {
+        return "none";
+    }
+
+
+    if (
+        data.status ===
+        "accepted"
+    ) {
+
+        return "accepted";
+    }
+
+
+    if (
+        data.status ===
+        "pending"
+    ) {
+
+        if (
+            data.requester_id ===
+            currentUserId
+        ) {
+
+            return "pending_sent";
+
+        } else {
+
+            return "pending_received";
+        }
+    }
+
+
+    return "none";
+}
+
+
+// =========================================
+// ESCAPAR HTML
+// =========================================
+
+function escapeHtml(
+    text
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+}
+
+// =========================================
+// ACEPTAR / RECHAZAR SOLICITUD
+// =========================================
+
+async function updateFriendship(friendshipId, status) {
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient
+            .from("friendships")
+            .update({
+                status: status,
+                updated_at:
+                    new Date().toISOString()
+            })
+            .eq(
+                "id",
+                friendshipId
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error actualizando amistad:",
+            error
+        );
+
+
+        alert(
+            "⚠️ No pudimos actualizar la solicitud.\n\n" +
+            error.message
+        );
+
+
+        return false;
+
+    }
+
+}
+
+// =========================================
+// ELIMINAR AMIGO
+// =========================================
+
+async function deleteFriendship(
+    friendshipId
+) {
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient
+            .from("friendships")
+            .delete()
+            .eq(
+                "id",
+                friendshipId
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        console.log(
+            "🗑️ Amigo eliminado correctamente."
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error eliminando amigo:",
+            error
+        );
+
+        alert(
+            "⚠️ No pudimos eliminar al amigo.\n\n" +
+            error.message
+        );
+
+        return false;
+    }
+}
+
+
+// =========================================
+// ACEPTAR SOLICITUD DESDE BÚSQUEDA
+// =========================================
+
+async function acceptFriendRequest(
+    requesterId
+) {
+
+    if (!currentUserId) {
+        return false;
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("friendships")
+            .select("id")
+            .eq(
+                "requester_id",
+                requesterId
+            )
+            .eq(
+                "receiver_id",
+                currentUserId
+            )
+            .eq(
+                "status",
+                "pending"
+            )
+            .maybeSingle();
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (!data) {
+
+            alert(
+                "⚠️ La solicitud ya no está disponible."
+            );
+
+            return false;
+        }
+
+
+        const success =
+            await updateFriendship(
+                data.id,
+                "accepted"
+            );
+
+
+        if (success) {
+
+            await loadFriends();
+
+            await searchUsers(
+                friendSearchInput
+                    ?.value
+                    .trim()
+                    .toLowerCase()
+                    .replace(/^@/, "") || ""
+            );
+
+        }
+
+
+        return success;
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error aceptando solicitud:",
+            error
+        );
+
+
+        alert(
+            "⚠️ No pudimos aceptar la solicitud.\n\n" +
+            error.message
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+// =========================================
+// CREAR TARJETA DE AMIGO
+// =========================================
+
+function createFriendCard(
+    person,
+    friendship
+) {
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "friend-result friend-home-card";
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "friend-result-avatar";
+
+    if (person.avatar_url) {
+
+        const img =
+            document.createElement("img");
+
+        img.src = person.avatar_url;
+
+        img.alt =
+            "Foto de " +
+            (person.display_name || "usuario");
+
+        avatar.appendChild(img);
+
+    } else {
+
+        avatar.textContent =
+            (
+                person.display_name ||
+                person.username ||
+                "R"
+            )
+                .charAt(0)
+                .toUpperCase();
+    }
+
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "friend-result-info";
+
+    const name =
+        document.createElement("p");
+
+    name.className =
+        "friend-result-name";
+
+    name.textContent =
+        person.display_name ||
+        "ReViber";
+
+    const username =
+        document.createElement("p");
+
+    username.className =
+        "friend-result-username";
+
+    username.textContent =
+        "@" +
+        (person.username || "usuario");
+
+    const status =
+        document.createElement("span");
+
+    status.className =
+        "friend-status-text";
+
+    const statusMap = {
+        online: "🟢 Conectado",
+        away: "🟡 Ausente",
+        busy: "🔴 Ocupado",
+        offline: "⚫ Desconectado"
+    };
+
+    status.textContent =
+        statusMap[person.status] ||
+        "🟢 Conectado";
+
+    info.appendChild(name);
+    info.appendChild(username);
+    info.appendChild(status);
+
+    if (person.personal_message) {
+
+        const message =
+            document.createElement("small");
+
+        message.className =
+            "friend-personal-message";
+
+        message.textContent =
+            "💭 " +
+            person.personal_message;
+
+        info.appendChild(message);
+    }
+
+    const right =
+        document.createElement("div");
+
+    right.className =
+        "friend-card-right";
+
+    if (person.now_playing) {
+
+        const playing =
+            document.createElement("small");
+
+        playing.className =
+            "friend-now-playing";
+
+        playing.textContent =
+            "🎵 " +
+            person.now_playing;
+
+        right.appendChild(playing);
+    }
+
+    // MENÚ ⋮
+
+    const actions =
+        document.createElement("div");
+
+    actions.className =
+        "friend-card-actions";
+
+    const menuButton =
+        document.createElement("button");
+
+    menuButton.type = "button";
+    menuButton.className =
+        "friend-card-menu-button";
+
+    menuButton.textContent = "⋮";
+    menuButton.title = "Opciones";
+
+    const menu =
+        document.createElement("div");
+
+    menu.className =
+        "friend-card-menu";
+
+    const deleteButton =
+        document.createElement("button");
+
+    deleteButton.type = "button";
+
+    deleteButton.className =
+        "delete-friend-button";
+
+    deleteButton.textContent =
+        "🗑️ Eliminar amigo";
+
+    menuButton.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+            menu.classList.toggle("active");
+        }
+    );
+
+    deleteButton.addEventListener(
+        "click",
+        async function(event) {
+
+            event.stopPropagation();
+
+            const confirmDelete =
+                confirm(
+                    `¿Quieres eliminar a @${person.username || "usuario"} de tus amigos? 💚`
+                );
+
+            if (!confirmDelete) {
+                return;
+            }
+
+            deleteButton.disabled = true;
+
+            deleteButton.textContent =
+                "Eliminando...";
+
+            const success =
+                await deleteFriendship(
+                    friendship.id
+                );
+
+            if (success) {
+
+                await loadFriends();
+
+            } else {
+
+                deleteButton.disabled = false;
+
+                deleteButton.textContent =
+                    "🗑️ Eliminar amigo";
+            }
+        }
+    );
+
+    menu.appendChild(deleteButton);
+
+    actions.appendChild(menuButton);
+    actions.appendChild(menu);
+
+    card.appendChild(avatar);
+    card.appendChild(info);
+    card.appendChild(right);
+    card.appendChild(actions);
+
+    return card;
+}
+
+
+// =========================================
+// AVATAR
+// =========================================
+
+if (
+    avatarEdit &&
+    avatarInput
+) {
 
     avatarEdit.addEventListener(
         "click",
@@ -1069,7 +3411,7 @@ if (avatarEdit && avatarInput) {
         async function () {
 
             const file =
-                avatarInput.files[0];
+                avatarInput.files?.[0];
 
 
             if (!file) {
@@ -1077,66 +3419,66 @@ if (avatarEdit && avatarInput) {
             }
 
 
-            // =========================================
-            // VALIDAR TIPO
-            // =========================================
-
-            const allowedTypes = [
-                "image/jpeg",
-                "image/png",
-                "image/webp"
-            ];
-
-
-            if (!allowedTypes.includes(file.type)) {
+            if (
+                ![
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ].includes(
+                    file.type
+                )
+            ) {
 
                 alert(
-                    "⚠️ Solo puedes subir imágenes JPG, PNG o WEBP."
+                    "⚠️ Solo puedes subir JPG, PNG o WEBP."
                 );
 
-                avatarInput.value = "";
+
+                avatarInput.value =
+                    "";
+
 
                 return;
+
             }
 
 
-            // =========================================
-            // VALIDAR TAMAÑO
-            // =========================================
-
-            const maxSize =
-                5 * 1024 * 1024;
-
-
-            if (file.size > maxSize) {
+            if (
+                file.size >
+                5 * 1024 * 1024
+            ) {
 
                 alert(
-                    "⚠️ La imagen no puede superar los 5 MB."
+                    "⚠️ La foto no puede superar los 5 MB."
                 );
 
-                avatarInput.value = "";
+
+                avatarInput.value =
+                    "";
+
 
                 return;
+
             }
+
+
+            avatarEdit.disabled =
+                true;
+
+
+            avatarEdit.textContent =
+                "…";
 
 
             try {
 
-                avatarEdit.disabled =
-                    true;
-
-                avatarEdit.textContent =
-                    "…";
-
-
-                // =========================================
-                // SESIÓN
-                // =========================================
-
                 const {
                     data: sessionData,
                     error: sessionError
-                } = await supabaseClient.auth.getSession();
+                } =
+                    await supabaseClient
+                        .auth
+                        .getSession();
 
 
                 if (
@@ -1147,16 +3489,13 @@ if (avatarEdit && avatarInput) {
                     throw new Error(
                         "Tu sesión ya no está activa."
                     );
+
                 }
 
 
                 const user =
                     sessionData.session.user;
 
-
-                // =========================================
-                // ARCHIVO
-                // =========================================
 
                 const extension =
                     file.name
@@ -1169,30 +3508,24 @@ if (avatarEdit && avatarInput) {
                     `${user.id}/avatar-${Date.now()}.${extension}`;
 
 
-                console.log(
-                    "📸 Subiendo avatar:",
-                    filePath
-                );
-
-
-                // =========================================
-                // SUBIR STORAGE
-                // =========================================
-
                 const {
                     error: uploadError
-                } = await supabaseClient
-                    .storage
-                    .from("avatars")
-                    .upload(
-                        filePath,
-                        file,
-                        {
-                            cacheControl: "3600",
-                            upsert: false,
-                            contentType: file.type
-                        }
-                    );
+                } =
+                    await supabaseClient
+                        .storage
+                        .from("avatars")
+                        .upload(
+                            filePath,
+                            file,
+                            {
+                                cacheControl:
+                                    "3600",
+                                upsert:
+                                    false,
+                                contentType:
+                                    file.type
+                            }
+                        );
 
 
                 if (uploadError) {
@@ -1200,51 +3533,44 @@ if (avatarEdit && avatarInput) {
                 }
 
 
-                // =========================================
-                // URL PÚBLICA
-                // =========================================
-
                 const {
                     data: publicUrlData
-                } = supabaseClient
-                    .storage
-                    .from("avatars")
-                    .getPublicUrl(
-                        filePath
-                    );
+                } =
+                    supabaseClient
+                        .storage
+                        .from("avatars")
+                        .getPublicUrl(
+                            filePath
+                        );
 
 
                 const avatarUrl =
                     publicUrlData.publicUrl;
 
 
-                // =========================================
-                // GUARDAR EN PROFILES
-                // =========================================
-
                 const {
                     error: profileError
-                } = await supabaseClient
-                    .from("profiles")
-                    .update({
-                        avatar_url: avatarUrl,
-                        updated_at:
-                            new Date().toISOString()
-                    })
-                    .eq(
-                        "id",
-                        user.id
-                    );
+                } =
+                    await supabaseClient
+                        .from("profiles")
+                        .update({
+                            avatar_url:
+                                avatarUrl,
+
+                            updated_at:
+                                new Date()
+                                    .toISOString()
+                        })
+                        .eq(
+                            "id",
+                            user.id
+                        );
 
 
                 if (profileError) {
                     throw profileError;
                 }
 
-
-                // =========================================
-                // MOSTRAR EN PERFIL
-                // =========================================
 
                 if (avatarImage) {
 
@@ -1253,6 +3579,7 @@ if (avatarEdit && avatarInput) {
 
                     avatarImage.style.display =
                         "block";
+
                 }
 
 
@@ -1260,17 +3587,22 @@ if (avatarEdit && avatarInput) {
 
                     avatarLetter.style.display =
                         "none";
+
                 }
 
 
-                // =========================================
-                // MOSTRAR EN INICIO
-                // =========================================
+                if (currentProfile) {
 
-                updateHomeAvatar(
-                    avatarUrl,
-                    displayNameInput?.value
-                );
+                    currentProfile.avatar_url =
+                        avatarUrl;
+
+
+                    updateHomeAvatar(
+                        avatarUrl,
+                        currentProfile.display_name
+                    );
+
+                }
 
 
                 alert(
@@ -1297,15 +3629,19 @@ if (avatarEdit && avatarInput) {
                 avatarEdit.disabled =
                     false;
 
+
                 avatarEdit.textContent =
                     "+";
 
-                avatarInput.value = "";
+
+                avatarInput.value =
+                    "";
 
             }
 
         }
     );
+
 }
 
 
@@ -1324,7 +3660,10 @@ if (profileForm) {
 
             const {
                 data: sessionData
-            } = await supabaseClient.auth.getSession();
+            } =
+                await supabaseClient
+                    .auth
+                    .getSession();
 
 
             const session =
@@ -1337,9 +3676,11 @@ if (profileForm) {
                     "⚠️ Tu sesión ya no está activa."
                 );
 
+
                 showLogin();
 
                 return;
+
             }
 
 
@@ -1348,53 +3689,72 @@ if (profileForm) {
 
 
             const username =
-                usernameInput.value
+                usernameInput?.value
                     .trim()
-                    .toLowerCase();
+                    .toLowerCase() ||
+                "";
 
 
             const displayName =
-                displayNameInput.value.trim();
+                displayNameInput?.value
+                    .trim() ||
+                "";
 
 
             const personalMessage =
-                personalMessageInput.value.trim();
+                personalMessageInput?.value
+                    .trim() ||
+                "";
 
 
             const status =
-                statusInput.value;
+                statusInput?.value ||
+                "online";
 
 
             const nowPlaying =
-                nowPlayingInput.value.trim();
+                nowPlayingInput?.value
+                    .trim() ||
+                "";
 
-
-            // =========================================
-            // VALIDAR USERNAME
-            // =========================================
 
             if (
                 username &&
-                !/^[a-z0-9_]{3,20}$/.test(username)
+                !/^[a-z0-9_]{3,20}$/.test(
+                    username
+                )
             ) {
 
-                usernameHelp.textContent =
-                    "⚠️ Usa entre 3 y 20 caracteres: letras, números y _";
+                if (usernameHelp) {
 
-                usernameHelp.style.color =
-                    "#d9534f";
+                    usernameHelp.textContent =
+                        "⚠️ Usa entre 3 y 20 caracteres: letras, números y _";
 
-                usernameInput.focus();
+
+                    usernameHelp.style.color =
+                        "#d9534f";
+
+                }
+
+
+                usernameInput?.focus();
+
 
                 return;
+
             }
 
 
-            usernameHelp.textContent =
-                "3–20 caracteres: letras, números y _";
+            if (usernameHelp) {
 
-            usernameHelp.style.color =
-                "";
+                usernameHelp.textContent =
+                    "3–20 caracteres: letras, números y _";
+
+
+                usernameHelp.style.color =
+                    "";
+
+            }
 
 
             const saveButton =
@@ -1403,43 +3763,54 @@ if (profileForm) {
                 );
 
 
-            saveButton.disabled =
-                true;
+            if (saveButton) {
 
-            saveButton.textContent =
-                "GUARDANDO...";
+                saveButton.disabled =
+                    true;
+
+
+                saveButton.textContent =
+                    "GUARDANDO...";
+
+            }
 
 
             try {
 
                 const {
                     error
-                } = await supabaseClient
-                    .from("profiles")
-                    .update({
+                } =
+                    await supabaseClient
+                        .from("profiles")
+                        .update({
 
-                        username:
-                            username || null,
+                            username:
+                                username ||
+                                null,
 
-                        display_name:
-                            displayName || null,
+                            display_name:
+                                displayName ||
+                                null,
 
-                        personal_message:
-                            personalMessage || null,
+                            personal_message:
+                                personalMessage ||
+                                null,
 
-                        status,
+                            status,
 
-                        now_playing:
-                            nowPlaying || null,
+                            now_playing:
+                                nowPlaying ||
+                                null,
 
-                        updated_at:
-                            new Date().toISOString()
+                            updated_at:
+                                new Date()
+                                    .toISOString()
 
-                    })
-                    .eq(
-                        "id",
-                        user.id
-                    );
+                        })
+                        .eq(
+                            "id",
+                            user.id
+                        );
 
 
                 if (error) {
@@ -1447,32 +3818,35 @@ if (profileForm) {
                 }
 
 
-                // =========================================
-                // ACTUALIZAR INICIO INMEDIATAMENTE
-                // =========================================
+                currentProfile = {
 
-                const currentProfile = {
+                    ...(currentProfile ||
+                        {}),
 
-                    id: user.id,
+                    id:
+                        user.id,
 
                     username:
-                        username || null,
+                        username ||
+                        null,
 
                     display_name:
-                        displayName || null,
+                        displayName ||
+                        null,
 
                     personal_message:
-                        personalMessage || null,
+                        personalMessage ||
+                        null,
 
                     status,
 
                     now_playing:
-                        nowPlaying || null,
+                        nowPlaying ||
+                        null,
 
                     avatar_url:
-                        avatarImage?.style.display !== "none"
-                            ? avatarImage?.src
-                            : null
+                        currentProfile?.avatar_url ||
+                        null
 
                 };
 
@@ -1500,7 +3874,8 @@ if (profileForm) {
 
 
                 if (
-                    error.code === "23505"
+                    error.code ===
+                    "23505"
                 ) {
 
                     alert(
@@ -1521,21 +3896,27 @@ if (profileForm) {
 
             } finally {
 
-                saveButton.disabled =
-                    false;
+                if (saveButton) {
 
-                saveButton.textContent =
-                    "💚 GUARDAR PERFIL";
+                    saveButton.disabled =
+                        false;
+
+
+                    saveButton.textContent =
+                        "💚 GUARDAR PERFIL";
+
+                }
 
             }
 
         }
     );
+
 }
 
 
 // =========================================
-// GOOGLE
+// OAUTH
 // =========================================
 
 if (googleButton) {
@@ -1546,9 +3927,13 @@ if (googleButton) {
 
             const {
                 error
-            } = await supabaseClient.auth.signInWithOAuth({
-                provider: "google"
-            });
+            } =
+                await supabaseClient
+                    .auth
+                    .signInWithOAuth({
+                        provider:
+                            "google"
+                    });
 
 
             if (error) {
@@ -1567,12 +3952,9 @@ if (googleButton) {
 
         }
     );
+
 }
 
-
-// =========================================
-// FACEBOOK
-// =========================================
 
 if (facebookButton) {
 
@@ -1582,9 +3964,13 @@ if (facebookButton) {
 
             const {
                 error
-            } = await supabaseClient.auth.signInWithOAuth({
-                provider: "facebook"
-            });
+            } =
+                await supabaseClient
+                    .auth
+                    .signInWithOAuth({
+                        provider:
+                            "facebook"
+                    });
 
 
             if (error) {
@@ -1603,6 +3989,7 @@ if (facebookButton) {
 
         }
     );
+
 }
 
 
@@ -1610,10 +3997,13 @@ if (facebookButton) {
 // MENSAJES DE ERROR
 // =========================================
 
-function getAuthErrorMessage(error) {
+function getAuthErrorMessage(
+    error
+) {
 
     const message =
-        error?.message || "";
+        error?.message ||
+        "";
 
 
     if (
@@ -1622,9 +4012,7 @@ function getAuthErrorMessage(error) {
         )
     ) {
 
-        return (
-            "El correo o la contraseña no son correctos."
-        );
+        return "El correo o la contraseña no son correctos.";
 
     }
 
@@ -1635,9 +4023,7 @@ function getAuthErrorMessage(error) {
         )
     ) {
 
-        return (
-            "Este correo ya tiene una cuenta en ReVibe."
-        );
+        return "Este correo ya tiene una cuenta en ReVibe.";
 
     }
 
@@ -1648,9 +4034,7 @@ function getAuthErrorMessage(error) {
         )
     ) {
 
-        return (
-            "La contraseña debe tener al menos 6 caracteres."
-        );
+        return "La contraseña debe tener al menos 6 caracteres.";
 
     }
 
@@ -1661,9 +4045,7 @@ function getAuthErrorMessage(error) {
         )
     ) {
 
-        return (
-            "Primero debes confirmar tu correo electrónico."
-        );
+        return "Primero debes confirmar tu correo electrónico.";
 
     }
 
@@ -1672,15 +4054,19 @@ function getAuthErrorMessage(error) {
         message ||
         "Ocurrió un error. Inténtalo nuevamente."
     );
+
 }
 
 
 // =========================================
-// CAMBIOS DE SESIÓN
+// ESCUCHAR CAMBIOS DE SESIÓN
 // =========================================
 
 supabaseClient.auth.onAuthStateChange(
-    function (event, session) {
+    function (
+        event,
+        session
+    ) {
 
         console.log(
             "💚 ReVibe Auth:",
@@ -1689,8 +4075,17 @@ supabaseClient.auth.onAuthStateChange(
 
 
         if (
-            event === "SIGNED_OUT"
+            event ===
+            "SIGNED_OUT"
         ) {
+
+            currentUserId =
+                null;
+
+
+            currentProfile =
+                null;
+
 
             showLogin();
 
@@ -1701,7 +4096,42 @@ supabaseClient.auth.onAuthStateChange(
 
 
 // =========================================
-// COMPROBAR SESIÓN AL ABRIR
+// ESCAPE HTML
+// =========================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// =========================================
+// INICIAR REVIBE
 // =========================================
 
 async function initializeReVibe() {
@@ -1714,7 +4144,10 @@ async function initializeReVibe() {
     const {
         data,
         error
-    } = await supabaseClient.auth.getSession();
+    } =
+        await supabaseClient
+            .auth
+            .getSession();
 
 
     if (error) {
@@ -1724,9 +4157,11 @@ async function initializeReVibe() {
             error
         );
 
+
         showLogin();
 
         return;
+
     }
 
 
@@ -1736,13 +4171,16 @@ async function initializeReVibe() {
             "💚 Sesión encontrada."
         );
 
+
         await loadProfile();
+
 
     } else {
 
         console.log(
             "👋 No hay sesión."
         );
+
 
         showLogin();
 
@@ -1751,8 +4189,6 @@ async function initializeReVibe() {
 }
 
 
-// =========================================
-// INICIAR REVIBE
-// =========================================
+
 
 initializeReVibe();

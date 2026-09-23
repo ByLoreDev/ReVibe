@@ -1585,6 +1585,74 @@ footer span {
 }
 
 
+.friend-home-card {
+    position: relative;
+}
+
+.friend-card-actions {
+    position: relative;
+    margin-left: auto;
+}
+
+.friend-card-menu-button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: #f3f8f5;
+    color: #53665e;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+}
+
+.friend-card-menu-button:hover {
+    background: #dff5ea;
+    color: #20ad77;
+}
+
+.friend-card-menu {
+    position: absolute;
+    right: 0;
+    top: 42px;
+    min-width: 170px;
+    background: white;
+    border: 1px solid #e4eee9;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    display: none;
+    z-index: 50;
+}
+
+.friend-card-menu.active {
+    display: block;
+}
+
+.delete-friend-button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-align: left;
+    color: #d9534f;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.delete-friend-button:hover {
+    background: #fff0ef;
+}
+
+.delete-friend-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 /* MOBILE */
 
 @media (max-width: 480px) {
