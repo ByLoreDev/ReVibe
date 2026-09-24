@@ -160,6 +160,8 @@ let currentUserId = null;
 
 let currentProfile = null;
 
+let chatChannel = null;
+
 
 // =========================================
 // MOSTRAR PANTALLAS
@@ -3650,6 +3652,11 @@ function openChat(person) {
     chat.id =
         "revibeChat";
 
+        // =========================================
+// ⚡ CANAL REALTIME DEL CHAT
+// =========================================
+
+
     chat.className =
         "revibe-chat";
 
@@ -3683,14 +3690,18 @@ function openChat(person) {
         "Volver";
 
 
-    backButton.addEventListener(
-        "click",
-        function () {
+  backButton.addEventListener(
+    "click",
+    function () {
 
-            chat.remove();
-
+        if (chatChannel) {
+            supabaseClient.removeChannel(chatChannel);
+            chatChannel = null;
         }
-    );
+
+        chat.remove();
+    }
+);
 
 
     // AVATAR
@@ -3805,13 +3816,17 @@ function openChat(person) {
 
 
     closeButton.addEventListener(
-        "click",
-        function () {
+    "click",
+    function () {
 
-            chat.remove();
-
+        if (chatChannel) {
+            supabaseClient.removeChannel(chatChannel);
+            chatChannel = null;
         }
-    );
+
+        chat.remove();
+    }
+);
 
 
     header.appendChild(backButton);
@@ -3915,6 +3930,9 @@ async function loadChatMessages() {
                     ? "revibe-message sent"
                     : "revibe-message received";
 
+                    bubble.dataset.messageId =
+    message.id;
+
 
             const text =
                 document.createElement("div");
@@ -3970,6 +3988,111 @@ async function loadChatMessages() {
 }
 loadChatMessages();
 
+// =========================================
+// ⚡ RECIBIR MENSAJES EN TIEMPO REAL
+// =========================================
+
+chatChannel = supabaseClient
+    .channel(
+        "chat-" +
+        currentUserId +
+        "-" +
+        person.id
+    )
+    .on(
+        "postgres_changes",
+        {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter:
+                "receiver_id=eq." +
+                currentUserId
+        },
+        function (payload) {
+
+            const message = payload.new;
+
+            // Solo mostrar mensajes de la persona
+            // con la que estamos conversando
+            if (message.sender_id !== person.id) {
+                return;
+            }
+
+            // Evitar duplicados
+            const existing =
+                messages.querySelector(
+                    '[data-message-id="' +
+                    message.id +
+                    '"]'
+                );
+
+            if (existing) {
+                return;
+            }
+
+            // Quitar mensaje de "no hay mensajes"
+            if (empty && empty.parentNode) {
+                empty.remove();
+            }
+
+            const bubble =
+                document.createElement("div");
+
+            bubble.className =
+                "revibe-message received";
+
+            bubble.dataset.messageId =
+                message.id;
+
+            const text =
+                document.createElement("div");
+
+            text.className =
+                "revibe-message-text";
+
+            text.textContent =
+                message.content;
+
+            const time =
+                document.createElement("small");
+
+            time.className =
+                "revibe-message-time";
+
+            time.textContent =
+                new Date(
+                    message.created_at
+                ).toLocaleTimeString(
+                    [],
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+            bubble.appendChild(text);
+            bubble.appendChild(time);
+
+            messages.appendChild(bubble);
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+            console.log(
+                "💬 Nuevo mensaje recibido:",
+                message.content
+            );
+        }
+    )
+    .subscribe(function (status) {
+
+        console.log(
+            "⚡ Realtime chat:",
+            status
+        );
+
+    });
 
     // =========================================
     // ÁREA DE ESCRIBIR
