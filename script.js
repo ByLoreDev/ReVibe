@@ -3276,26 +3276,7 @@ status.title =
         info.appendChild(message);
     }
 
-    const right =
-        document.createElement("div");
-
-    right.className =
-        "friend-card-right";
-
-    if (person.now_playing) {
-
-        const playing =
-            document.createElement("small");
-
-        playing.className =
-            "friend-now-playing";
-
-        playing.textContent =
-            "🎵 " +
-            person.now_playing;
-
-        right.appendChild(playing);
-    }
+   
 
  // MENÚ ⋮
 
@@ -3442,7 +3423,6 @@ card.appendChild(avatar);
 
 card.appendChild(info);
 
-card.appendChild(right);
 
 card.appendChild(actions);
 
@@ -3789,6 +3769,21 @@ function openChat(person) {
     info.appendChild(name);
 
     info.appendChild(status);
+
+    if (person.now_playing) {
+
+    const nowPlaying =
+        document.createElement("span");
+
+    nowPlaying.className =
+        "revibe-chat-now-playing";
+
+    nowPlaying.textContent =
+        "🎵 " +
+        person.now_playing;
+
+    info.appendChild(nowPlaying);
+}
 
 
     // BOTÓN CERRAR

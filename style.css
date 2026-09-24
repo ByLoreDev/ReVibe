@@ -2187,6 +2187,24 @@ footer span {
     font-size: 12px;
 
     color: #82918b;
+
+    .revibe-chat-now-playing {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 12px;
+
+    color: #20ad77;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    max-width: 220px;
+}
 }
 
 
