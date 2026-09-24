@@ -3859,6 +3859,117 @@ function openChat(person) {
 
     messages.appendChild(empty);
 
+    // =========================================
+// CARGAR MENSAJES
+// =========================================
+
+async function loadChatMessages() {
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("messages")
+            .select("*")
+            .or(
+                `and(sender_id.eq.${currentUserId},receiver_id.eq.${person.id}),and(sender_id.eq.${person.id},receiver_id.eq.${currentUserId})`
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+        if (error) {
+            throw error;
+        }
+
+
+        // Limpiar mensajes anteriores
+
+        messages.innerHTML = "";
+
+
+        // Si no hay mensajes
+
+        if (!data || data.length === 0) {
+
+            messages.appendChild(empty);
+
+            return;
+        }
+
+
+        // Crear cada mensaje
+
+        data.forEach(function(message) {
+
+            const bubble =
+                document.createElement("div");
+
+            bubble.className =
+                message.sender_id === currentUserId
+                    ? "revibe-message sent"
+                    : "revibe-message received";
+
+
+            const text =
+                document.createElement("div");
+
+            text.className =
+                "revibe-message-text";
+
+            text.textContent =
+                message.content;
+
+
+            const time =
+                document.createElement("small");
+
+            time.className =
+                "revibe-message-time";
+
+            time.textContent =
+                new Date(
+                    message.created_at
+                ).toLocaleTimeString(
+                    [],
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+
+            bubble.appendChild(text);
+
+            bubble.appendChild(time);
+
+            messages.appendChild(bubble);
+
+        });
+
+
+        // Ir al último mensaje
+
+        messages.scrollTop =
+            messages.scrollHeight;
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error cargando mensajes:",
+            error
+        );
+
+    }
+}
+loadChatMessages();
+
 
     // =========================================
     // ÁREA DE ESCRIBIR
@@ -3904,6 +4015,69 @@ function openChat(person) {
 
     sendButton.title =
         "Enviar";
+
+        sendButton.addEventListener(
+    "click",
+    async function () {
+
+        const content =
+            input.value.trim();
+
+        if (!content) {
+            return;
+        }
+
+        if (!currentUserId) {
+            alert(
+                "⚠️ Tu sesión no está activa."
+            );
+            return;
+        }
+
+        sendButton.disabled = true;
+
+        try {
+
+            const {
+                error
+            } = await supabaseClient
+                .from("messages")
+                .insert({
+                    sender_id: currentUserId,
+                    receiver_id: person.id,
+                    content: content
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            console.log(
+                "💚 Mensaje enviado correctamente."
+            );
+
+            input.value = "";
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error enviando mensaje:",
+                error
+            );
+
+            alert(
+                "⚠️ No pudimos enviar el mensaje.\n\n" +
+                error.message
+            );
+
+        } finally {
+
+            sendButton.disabled = false;
+
+            input.focus();
+        }
+    }
+);
 
 
     composer.appendChild(input);

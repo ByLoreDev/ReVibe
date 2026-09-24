@@ -2249,6 +2249,46 @@ footer span {
     flex-direction: column;
 }
 
+/* =========================================
+   BURBUJAS DE MENSAJES
+========================================= */
+
+.revibe-message {
+    max-width: 75%;
+    margin-bottom: 10px;
+    padding: 9px 13px 7px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    word-wrap: break-word;
+}
+
+.revibe-message.sent {
+    align-self: flex-end;
+    background: #20ad77;
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.revibe-message.received {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #263a33;
+    border: 1px solid #e2eee9;
+    border-bottom-left-radius: 5px;
+}
+
+.revibe-message-text {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.revibe-message-time {
+    font-size: 10px;
+    opacity: 0.7;
+    align-self: flex-end;
+}
 
 /* ESTADO VACÍO */
 
