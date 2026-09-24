@@ -3147,17 +3147,35 @@ function createFriendCard(
     friendship
 ) {
 
+      
     const card =
-        document.createElement("div");
+    document.createElement("div");
 
-    card.className =
-        "friend-result friend-home-card";
+card.className =
+    "friend-result friend-home-card";
 
-    const avatar =
-        document.createElement("div");
+
+// =========================================
+// ABRIR CHAT AL HACER CLIC EN LA TARJETA
+// =========================================
+
+card.style.cursor = "pointer";
+
+card.addEventListener(
+    "click",
+    function () {
+
+        openChat(person);
+
+    }
+);
+
+
+const avatar =
+    document.createElement("div");
 
     avatar.className =
-        "friend-result-avatar";
+    "friend-result-avatar";
 
     if (person.avatar_url) {
 
@@ -3626,6 +3644,304 @@ function openFriendProfile(person) {
     );
 }
 
+
+// =========================================
+// ABRIR CHAT
+// =========================================
+
+function openChat(person) {
+
+    // Si ya existe un chat abierto, lo cerramos
+    const existingChat =
+        document.getElementById("revibeChat");
+
+    if (existingChat) {
+        existingChat.remove();
+    }
+
+
+    // =========================================
+    // CONTENEDOR PRINCIPAL
+    // =========================================
+
+    const chat =
+        document.createElement("div");
+
+    chat.id =
+        "revibeChat";
+
+    chat.className =
+        "revibe-chat";
+
+
+    // =========================================
+    // HEADER
+    // =========================================
+
+    const header =
+        document.createElement("div");
+
+    header.className =
+        "revibe-chat-header";
+
+
+    // BOTÓN VOLVER
+
+    const backButton =
+        document.createElement("button");
+
+    backButton.type =
+        "button";
+
+    backButton.className =
+        "revibe-chat-back";
+
+    backButton.textContent =
+        "←";
+
+    backButton.title =
+        "Volver";
+
+
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            chat.remove();
+
+        }
+    );
+
+
+    // AVATAR
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "revibe-chat-avatar";
+
+
+    if (person.avatar_url) {
+
+        const image =
+            document.createElement("img");
+
+        image.src =
+            person.avatar_url;
+
+        image.alt =
+            "Foto de perfil";
+
+        avatar.appendChild(image);
+
+    } else {
+
+        avatar.textContent =
+            (
+                person.display_name ||
+                person.username ||
+                "U"
+            )
+            .charAt(0)
+            .toUpperCase();
+    }
+
+
+    // INFORMACIÓN
+
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "revibe-chat-info";
+
+
+    const name =
+        document.createElement("h2");
+
+    name.textContent =
+        person.display_name ||
+        person.username ||
+        "Usuario";
+
+
+    const status =
+        document.createElement("span");
+
+    status.className =
+        "revibe-chat-status";
+
+
+    const statusMap = {
+        online: "🟢 Conectado",
+        away: "🟡 Ausente",
+        busy: "🔴 Ocupado",
+        offline: "⚫ Desconectado"
+    };
+
+
+    status.textContent =
+        statusMap[person.status] ||
+        "🟢 Conectado";
+
+
+    info.appendChild(name);
+
+    info.appendChild(status);
+
+
+    // BOTÓN CERRAR
+
+    const closeButton =
+        document.createElement("button");
+
+    closeButton.type =
+        "button";
+
+    closeButton.className =
+        "revibe-chat-close";
+
+    closeButton.textContent =
+        "✕";
+
+    closeButton.title =
+        "Cerrar";
+
+
+    closeButton.addEventListener(
+        "click",
+        function () {
+
+            chat.remove();
+
+        }
+    );
+
+
+    header.appendChild(backButton);
+
+    header.appendChild(avatar);
+
+    header.appendChild(info);
+
+    header.appendChild(closeButton);
+
+
+    // =========================================
+    // ÁREA DE MENSAJES
+    // =========================================
+
+    const messages =
+        document.createElement("div");
+
+    messages.className =
+        "revibe-chat-messages";
+
+
+    const empty =
+        document.createElement("div");
+
+    empty.className =
+        "revibe-chat-empty";
+
+
+    empty.innerHTML = `
+        <div class="revibe-chat-empty-icon">💚</div>
+        <h3>¡Hola!</h3>
+        <p>
+            Empieza una conversación con
+            <strong>
+                ${escapeHtml(
+                    person.display_name ||
+                    person.username ||
+                    "tu amigo"
+                )}
+            </strong>.
+        </p>
+    `;
+
+
+    messages.appendChild(empty);
+
+
+    // =========================================
+    // ÁREA DE ESCRIBIR
+    // =========================================
+
+    const composer =
+        document.createElement("div");
+
+    composer.className =
+        "revibe-chat-composer";
+
+
+    const input =
+        document.createElement("input");
+
+    input.type =
+        "text";
+
+    input.className =
+        "revibe-chat-input";
+
+    input.placeholder =
+        "Escribe un mensaje...";
+
+    input.maxLength =
+        1000;
+
+    input.autocomplete =
+        "off";
+
+
+    const sendButton =
+        document.createElement("button");
+
+    sendButton.type =
+        "button";
+
+    sendButton.className =
+        "revibe-chat-send";
+
+    sendButton.textContent =
+        "➤";
+
+    sendButton.title =
+        "Enviar";
+
+
+    composer.appendChild(input);
+
+    composer.appendChild(sendButton);
+
+
+    // =========================================
+    // ARMAR CHAT
+    // =========================================
+
+    chat.appendChild(header);
+
+    chat.appendChild(messages);
+
+    chat.appendChild(composer);
+
+    document.body.appendChild(chat);
+
+
+    // =========================================
+    // ENFOCAR INPUT
+    // =========================================
+
+    setTimeout(
+        function () {
+
+            input.focus();
+
+        },
+        100
+    );
+}
 function openFriendProfile(person) {
 
     const overlay =
