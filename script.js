@@ -4016,68 +4016,184 @@ loadChatMessages();
     sendButton.title =
         "Enviar";
 
-        sendButton.addEventListener(
-    "click",
-    async function () {
+       // =========================================
+// ENVIAR MENSAJE
+// =========================================
 
-        const content =
-            input.value.trim();
+async function sendChatMessage() {
 
-        if (!content) {
-            return;
-        }
+    const content =
+        input.value.trim();
 
-        if (!currentUserId) {
-            alert(
-                "⚠️ Tu sesión no está activa."
-            );
-            return;
-        }
+    if (!content) {
+        return;
+    }
 
-        sendButton.disabled = true;
+    if (!currentUserId) {
 
-        try {
+        alert(
+            "⚠️ Tu sesión no está activa."
+        );
 
-            const {
-                error
-            } = await supabaseClient
-                .from("messages")
-                .insert({
-                    sender_id: currentUserId,
-                    receiver_id: person.id,
-                    content: content
-                });
+        return;
+    }
 
-            if (error) {
-                throw error;
+
+    // =========================================
+    // CREAR BURBUJA INMEDIATAMENTE
+    // =========================================
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        "revibe-message sent";
+
+
+    const text =
+        document.createElement("div");
+
+    text.className =
+        "revibe-message-text";
+
+    text.textContent =
+        content;
+
+
+    const time =
+        document.createElement("small");
+
+    time.className =
+        "revibe-message-time";
+
+    time.textContent =
+        new Date().toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
             }
+        );
 
-            console.log(
-                "💚 Mensaje enviado correctamente."
-            );
 
-            input.value = "";
+    bubble.appendChild(text);
 
-        } catch (error) {
+    bubble.appendChild(time);
 
-            console.error(
-                "❌ Error enviando mensaje:",
-                error
-            );
+    messages.appendChild(bubble);
 
-            alert(
-                "⚠️ No pudimos enviar el mensaje.\n\n" +
-                error.message
-            );
 
-        } finally {
+    // Quitar mensaje de bienvenida si todavía está visible
 
-            sendButton.disabled = false;
+    if (empty && empty.parentNode) {
+        empty.remove();
+    }
 
-            input.focus();
+
+    // Limpiar input inmediatamente
+
+    input.value = "";
+
+    input.focus();
+
+
+    // Bajar automáticamente al último mensaje
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
+
+    // =========================================
+    // GUARDAR EN SUPABASE
+    // =========================================
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient
+            .from("messages")
+            .insert({
+                sender_id:
+                    currentUserId,
+
+                receiver_id:
+                    person.id,
+
+                content:
+                    content
+            });
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        console.log(
+            "💚 Mensaje enviado correctamente."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error enviando mensaje:",
+            error
+        );
+
+
+        // Quitar la burbuja si no pudo guardarse
+
+        bubble.remove();
+
+
+        // Recuperar el texto
+
+        input.value =
+            content;
+
+        input.focus();
+
+
+        alert(
+            "⚠️ No pudimos enviar el mensaje.\n\n" +
+            error.message
+        );
+    }
+}
+
+
+// =========================================
+// BOTÓN ENVIAR
+// =========================================
+
+sendButton.addEventListener(
+    "click",
+    sendChatMessage
+);
+
+
+// =========================================
+// ENTER PARA ENVIAR
+// =========================================
+
+input.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            sendChatMessage();
         }
     }
 );
+
 
 
     composer.appendChild(input);
