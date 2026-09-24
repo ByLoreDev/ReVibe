@@ -2667,17 +2667,8 @@ function renderFriendsHome(
         return;
     }
 
-    // Título de amigos
-    const title =
-        document.createElement("div");
-
-    title.className =
-        "friends-loaded-title";
-
-    title.innerHTML =
-        "<h3>👥 Tus amigos</h3>";
-
-    friendsList.appendChild(title);
+    
+   
 
     // Mostrar amigos
     accepted.forEach(friendship => {
@@ -3220,21 +3211,33 @@ function createFriendCard(
         (person.username || "usuario");
 
     const status =
-        document.createElement("span");
+    document.createElement("span");
 
-    status.className =
-        "friend-status-text";
+status.className =
+    "friend-status-dot status-" +
+    (person.status || "online");
 
-    const statusMap = {
-        online: "🟢 Conectado",
-        away: "🟡 Ausente",
-        busy: "🔴 Ocupado",
-        offline: "⚫ Desconectado"
-    };
+const statusMap = {
+    online: "🟢",
+    away: "🟡",
+    busy: "🔴",
+    offline: "⚫"
+};
 
-    status.textContent =
-        statusMap[person.status] ||
-        "🟢 Conectado";
+status.textContent =
+    statusMap[person.status] ||
+    "🟢";
+
+status.title =
+    person.status === "online"
+        ? "Conectado"
+        : person.status === "away"
+            ? "Ausente"
+            : person.status === "busy"
+                ? "Ocupado"
+                : "Desconectado";
+
+
 
     info.appendChild(name);
     info.appendChild(username);
@@ -3276,103 +3279,547 @@ function createFriendCard(
         right.appendChild(playing);
     }
 
-    // MENÚ ⋮
+ // MENÚ ⋮
 
-    const actions =
+const actions =
+    document.createElement("div");
+
+actions.className =
+    "friend-card-actions";
+
+const menuButton =
+    document.createElement("button");
+
+menuButton.type = "button";
+
+menuButton.className =
+    "friend-card-menu-button";
+
+menuButton.textContent = "⋮";
+
+menuButton.title = "Opciones";
+
+
+// CONTENEDOR DEL MENÚ
+
+const menu =
+    document.createElement("div");
+
+menu.className =
+    "friend-card-menu";
+
+
+// 👤 VER PERFIL
+
+const profileButton =
+    document.createElement("button");
+
+profileButton.type = "button";
+
+profileButton.className =
+    "view-friend-profile-button";
+
+profileButton.textContent =
+    "👤 Ver perfil";
+
+profileButton.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+        menu.classList.remove("active");
+
+        openFriendProfile(person);
+    }
+);
+
+
+// 🗑️ ELIMINAR AMIGO
+
+const deleteButton =
+    document.createElement("button");
+
+deleteButton.type = "button";
+
+deleteButton.className =
+    "delete-friend-button";
+
+deleteButton.textContent =
+    "🗑️ Eliminar amigo";
+
+
+// ABRIR / CERRAR MENÚ ⋮
+
+menuButton.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+        menu.classList.toggle("active");
+    }
+);
+
+
+// ELIMINAR AMIGO
+
+deleteButton.addEventListener(
+    "click",
+    async function(event) {
+
+        event.stopPropagation();
+
+        const confirmDelete =
+            confirm(
+                `¿Quieres eliminar a @${person.username || "usuario"} de tus amigos? 💚`
+            );
+
+        if (!confirmDelete) {
+            return;
+        }
+
+        deleteButton.disabled = true;
+
+        deleteButton.textContent =
+            "Eliminando...";
+
+        const success =
+            await deleteFriendship(
+                friendship.id
+            );
+
+        if (success) {
+
+            await loadFriends();
+
+        } else {
+
+            deleteButton.disabled = false;
+
+            deleteButton.textContent =
+                "🗑️ Eliminar amigo";
+        }
+    }
+);
+
+
+// AGREGAR OPCIONES AL MENÚ
+
+menu.appendChild(profileButton);
+
+menu.appendChild(deleteButton);
+
+
+// AGREGAR MENÚ A LA TARJETA
+
+actions.appendChild(menuButton);
+
+actions.appendChild(menu);
+
+
+// AGREGAR TODO A LA TARJETA
+
+card.appendChild(avatar);
+
+card.appendChild(info);
+
+card.appendChild(right);
+
+card.appendChild(actions);
+
+return card;
+}
+
+function openFriendProfile(person) {
+
+    const overlay =
         document.createElement("div");
 
-    actions.className =
-        "friend-card-actions";
+    overlay.className =
+        "friend-profile-overlay";
 
-    const menuButton =
-        document.createElement("button");
-
-    menuButton.type = "button";
-    menuButton.className =
-        "friend-card-menu-button";
-
-    menuButton.textContent = "⋮";
-    menuButton.title = "Opciones";
-
-    const menu =
+    const modal =
         document.createElement("div");
 
-    menu.className =
-        "friend-card-menu";
+    modal.className =
+        "friend-profile-modal";
 
-    const deleteButton =
+
+    // CERRAR
+
+    const closeButton =
         document.createElement("button");
 
-    deleteButton.type = "button";
+    closeButton.type = "button";
 
-    deleteButton.className =
-        "delete-friend-button";
+    closeButton.className =
+        "friend-profile-close";
 
-    deleteButton.textContent =
-        "🗑️ Eliminar amigo";
+    closeButton.textContent = "✕";
 
-    menuButton.addEventListener(
+    closeButton.addEventListener(
+        "click",
+        function() {
+            overlay.remove();
+        }
+    );
+
+
+    // AVATAR
+
+    const avatarContainer =
+        document.createElement("div");
+
+    avatarContainer.className =
+        "friend-profile-avatar";
+
+
+    if (person.avatar_url) {
+
+        const image =
+            document.createElement("img");
+
+        image.src =
+            person.avatar_url;
+
+        image.alt =
+            "Foto de perfil";
+
+        avatarContainer.appendChild(image);
+
+    } else {
+
+        avatarContainer.textContent =
+            (person.display_name ||
+             person.username ||
+             "U")
+             .charAt(0)
+             .toUpperCase();
+    }
+
+
+    // NOMBRE
+
+    const name =
+        document.createElement("h2");
+
+    name.textContent =
+        person.display_name ||
+        person.username ||
+        "Usuario";
+
+
+    // USUARIO
+
+    const username =
+        document.createElement("p");
+
+    username.className =
+        "friend-profile-username";
+
+    username.textContent =
+        "@" +
+        (person.username || "usuario");
+
+
+    // ESTADO
+
+    const status =
+        document.createElement("div");
+
+    status.className =
+        "friend-profile-status";
+
+
+    const statusDot =
+        document.createElement("span");
+
+    statusDot.className =
+        "friend-status-dot status-" +
+        (person.status || "offline");
+
+
+    const statusText = {
+        online: "Conectado",
+        away: "Ausente",
+        busy: "Ocupado",
+        offline: "Desconectado"
+    };
+
+
+    const statusLabel =
+        document.createElement("span");
+
+    statusLabel.textContent =
+        statusText[person.status] ||
+        "Desconectado";
+
+
+    status.appendChild(statusDot);
+
+    status.appendChild(statusLabel);
+
+
+    // MENSAJE PERSONAL
+
+    const message =
+        document.createElement("p");
+
+    message.className =
+        "friend-profile-message";
+
+    message.textContent =
+        person.personal_message ||
+        "Sin mensaje personal 💚";
+
+
+    // NOW PLAYING
+
+    const nowPlaying =
+        document.createElement("div");
+
+    nowPlaying.className =
+        "friend-profile-now-playing";
+
+    nowPlaying.textContent =
+        "🎵 " +
+        (
+            person.now_playing ||
+            "Nada reproduciendo"
+        );
+
+
+    // ARMAR MODAL
+
+    modal.appendChild(closeButton);
+
+    modal.appendChild(avatarContainer);
+
+    modal.appendChild(name);
+
+    modal.appendChild(username);
+
+    modal.appendChild(status);
+
+    modal.appendChild(message);
+
+    modal.appendChild(nowPlaying);
+
+
+    overlay.appendChild(modal);
+
+    document.body.appendChild(overlay);
+
+
+    // CERRAR AL HACER CLICK FUERA
+
+    overlay.addEventListener(
         "click",
         function(event) {
 
-            event.stopPropagation();
+            if (event.target === overlay) {
 
-            menu.classList.toggle("active");
-        }
-    );
-
-    deleteButton.addEventListener(
-        "click",
-        async function(event) {
-
-            event.stopPropagation();
-
-            const confirmDelete =
-                confirm(
-                    `¿Quieres eliminar a @${person.username || "usuario"} de tus amigos? 💚`
-                );
-
-            if (!confirmDelete) {
-                return;
-            }
-
-            deleteButton.disabled = true;
-
-            deleteButton.textContent =
-                "Eliminando...";
-
-            const success =
-                await deleteFriendship(
-                    friendship.id
-                );
-
-            if (success) {
-
-                await loadFriends();
-
-            } else {
-
-                deleteButton.disabled = false;
-
-                deleteButton.textContent =
-                    "🗑️ Eliminar amigo";
+                overlay.remove();
             }
         }
     );
-
-    menu.appendChild(deleteButton);
-
-    actions.appendChild(menuButton);
-    actions.appendChild(menu);
-
-    card.appendChild(avatar);
-    card.appendChild(info);
-    card.appendChild(right);
-    card.appendChild(actions);
-
-    return card;
 }
 
+function openFriendProfile(person) {
+
+    const overlay =
+        document.createElement("div");
+
+    overlay.className =
+        "friend-profile-overlay";
+
+    const modal =
+        document.createElement("div");
+
+    modal.className =
+        "friend-profile-modal";
+
+
+    // CERRAR
+
+    const closeButton =
+        document.createElement("button");
+
+    closeButton.type = "button";
+
+    closeButton.className =
+        "friend-profile-close";
+
+    closeButton.textContent = "✕";
+
+    closeButton.addEventListener(
+        "click",
+        function() {
+            overlay.remove();
+        }
+    );
+
+
+    // AVATAR
+
+    const avatarContainer =
+        document.createElement("div");
+
+    avatarContainer.className =
+        "friend-profile-avatar";
+
+
+    if (person.avatar_url) {
+
+        const image =
+            document.createElement("img");
+
+        image.src =
+            person.avatar_url;
+
+        image.alt =
+            "Foto de perfil";
+
+        avatarContainer.appendChild(image);
+
+    } else {
+
+        avatarContainer.textContent =
+            (person.display_name ||
+             person.username ||
+             "U")
+             .charAt(0)
+             .toUpperCase();
+    }
+
+
+    // NOMBRE
+
+    const name =
+        document.createElement("h2");
+
+    name.textContent =
+        person.display_name ||
+        person.username ||
+        "Usuario";
+
+
+    // USUARIO
+
+    const username =
+        document.createElement("p");
+
+    username.className =
+        "friend-profile-username";
+
+    username.textContent =
+        "@" +
+        (person.username || "usuario");
+
+
+    // ESTADO
+
+    const status =
+        document.createElement("div");
+
+    status.className =
+        "friend-profile-status";
+
+
+    const statusDot =
+        document.createElement("span");
+
+    statusDot.className =
+        "friend-status-dot status-" +
+        (person.status || "offline");
+
+
+    const statusText = {
+        online: "Conectado",
+        away: "Ausente",
+        busy: "Ocupado",
+        offline: "Desconectado"
+    };
+
+
+    const statusLabel =
+        document.createElement("span");
+
+    statusLabel.textContent =
+        statusText[person.status] ||
+        "Desconectado";
+
+
+    status.appendChild(statusDot);
+
+    status.appendChild(statusLabel);
+
+
+    // MENSAJE PERSONAL
+
+    const message =
+        document.createElement("p");
+
+    message.className =
+        "friend-profile-message";
+
+    message.textContent =
+        person.personal_message ||
+        "Sin mensaje personal 💚";
+
+
+    // NOW PLAYING
+
+    const nowPlaying =
+        document.createElement("div");
+
+    nowPlaying.className =
+        "friend-profile-now-playing";
+
+    nowPlaying.textContent =
+        "🎵 " +
+        (
+            person.now_playing ||
+            "Nada reproduciendo"
+        );
+
+
+    // ARMAR MODAL
+
+    modal.appendChild(closeButton);
+
+    modal.appendChild(avatarContainer);
+
+    modal.appendChild(name);
+
+    modal.appendChild(username);
+
+    modal.appendChild(status);
+
+    modal.appendChild(message);
+
+    modal.appendChild(nowPlaying);
+
+
+    overlay.appendChild(modal);
+
+    document.body.appendChild(overlay);
+
+
+    // CERRAR AL HACER CLICK FUERA
+
+    overlay.addEventListener(
+        "click",
+        function(event) {
+
+            if (event.target === overlay) {
+
+                overlay.remove();
+            }
+        }
+    );
+}
 
 // =========================================
 // AVATAR

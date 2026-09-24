@@ -1653,6 +1653,236 @@ footer span {
     cursor: wait;
 }
 
+.friend-status-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    font-size: 0;
+    vertical-align: middle;
+    margin-left: 5px;
+    position: relative;
+    top: -1px;
+}
+
+.friend-status-dot.status-online {
+    background: #35c98a;
+}
+
+.friend-status-dot.status-away {
+    background: #f2c94c;
+}
+
+.friend-status-dot.status-busy {
+    background: #eb5757;
+}
+
+.friend-status-dot.status-offline {
+    background: #9aa5a1;
+}
+.friend-result-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 15px;
+}
+
+
+.friend-result-info > .friend-status-dot {
+    position: absolute;
+    left: 0;
+    top: 8px;
+   
+}
+
+.friend-result-info {
+    position: relative;
+}
+
+.view-friend-profile-button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-align: left;
+    color: #53665e;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.view-friend-profile-button:hover {
+    background: #f0f8f4;
+    color: #20ad77;
+}
+
+/* ================================
+   PERFIL DE AMIGO
+================================ */
+
+.friend-profile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 50, 42, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.friend-profile-modal {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 30px 25px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+    animation: friendProfileAppear 0.2s ease;
+}
+
+@keyframes friendProfileAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* BOTÓN CERRAR */
+
+.friend-profile-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #f1f7f4;
+    color: #53665e;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.friend-profile-close:hover {
+    background: #dff5ea;
+    color: #20ad77;
+}
+
+
+/* AVATAR */
+
+.friend-profile-avatar {
+    width: 110px;
+    height: 110px;
+    margin: 5px auto 18px;
+    border-radius: 50%;
+    background: #dff5ea;
+    border: 4px solid #bcebd7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #20ad77;
+    font-size: 42px;
+    font-weight: 700;
+}
+
+.friend-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* NOMBRE */
+
+.friend-profile-modal h2 {
+    margin: 0;
+    color: #263a33;
+    font-size: 22px;
+}
+
+
+/* USUARIO */
+
+.friend-profile-username {
+    margin: 5px 0 14px;
+    color: #82918b;
+    font-size: 14px;
+}
+
+
+/* ESTADO */
+
+.friend-profile-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #f3f8f5;
+    color: #53665e;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.friend-profile-status .friend-status-dot {
+    margin-left: 0;
+    top: 0;
+}
+
+
+/* MENSAJE */
+
+.friend-profile-message {
+    margin: 0 0 15px;
+    padding: 12px 14px;
+    background: #f7faf8;
+    border-radius: 12px;
+    color: #53665e;
+    font-size: 14px;
+}
+
+
+/* NOW PLAYING */
+
+.friend-profile-now-playing {
+    padding: 10px 14px;
+    background: #eaf8f1;
+    border-radius: 12px;
+    color: #20ad77;
+    font-size: 14px;
+}
+
+
+/* MÓVIL */
+
+@media (max-width: 480px) {
+
+    .friend-profile-modal {
+        max-width: 330px;
+        padding: 25px 20px;
+    }
+
+    .friend-profile-avatar {
+        width: 95px;
+        height: 95px;
+    }
+
+}
+
 /* MOBILE */
 
 @media (max-width: 480px) {
