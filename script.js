@@ -162,7 +162,241 @@ let currentProfile = null;
 
 let chatChannel = null;
 
+let notificationChannel = null;
 
+// =========================================// 🔔 NOTIFICACIÓN DE MENSAJE NUEVO
+// =========================================
+
+function showMessageNotification(person, message) {
+
+    // Si ya estamos dentro de ese chat,
+    // no mostramos notificación
+   const openChatElement =
+    document.getElementById("revibeChat");
+
+ if (
+    openChatElement &&
+    openChatElement.dataset.personId === person.id
+) {
+    return;
+}
+
+    // Crear notificación
+    const notification =
+        document.createElement("div");
+
+    notification.className =
+        "revibe-message-notification";
+
+    notification.innerHTML = `
+        <div class="revibe-notification-icon">
+            💬
+        </div>
+
+        <div class="revibe-notification-content">
+            <strong>
+                ${escapeHtml(
+                    person.display_name ||
+                    person.username ||
+                    "Nuevo mensaje"
+                )}
+            </strong>
+
+            <span>
+                ${escapeHtml(message.content)}
+            </span>
+        </div>
+
+        <button
+            type="button"
+            class="revibe-notification-close"
+            aria-label="Cerrar"
+        >
+            ✕
+        </button>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Mostrar con animación
+    requestAnimationFrame(function () {
+        notification.classList.add("show");
+    });
+
+    // Cerrar manualmente
+    const closeButton =
+        notification.querySelector(
+            ".revibe-notification-close"
+        );
+
+    closeButton.addEventListener(
+        "click",
+        function () {
+
+            notification.classList.remove(
+                "show"
+            );
+
+            setTimeout(function () {
+                notification.remove();
+            }, 250);
+        }
+    );
+
+    // Al hacer clic en la notificación,
+    // abrir el chat
+  notification.addEventListener(
+    "click",
+    function (event) {
+
+        // Si hicieron clic en X,
+        // no abrir el chat
+        if (
+            event.target.closest(
+                ".revibe-notification-close"
+            )
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        console.log(
+            "💬 Abriendo chat desde notificación:",
+            person
+        );
+
+        // Abrir primero el chat
+        openChat(person);
+
+        // Luego quitar la notificación
+        notification.remove();
+    }
+);
+
+    // Desaparecer automáticamente
+    setTimeout(function () {
+
+        if (
+            notification &&
+            notification.parentNode
+        ) {
+
+            notification.classList.remove(
+                "show"
+            );
+
+            setTimeout(function () {
+
+                if (
+                    notification &&
+                    notification.parentNode
+                ) {
+                    notification.remove();
+                }
+
+            }, 250);
+        }
+
+    }, 5000);
+}
+
+// =========================================
+// 🔔 ESCUCHAR NOTIFICACIONES DE MENSAJES
+// =========================================
+
+async function startMessageNotifications() {
+
+    if (!currentUserId) {
+        return;
+    }
+
+    // Evitar canales duplicados
+    if (notificationChannel) {
+        await supabaseClient.removeChannel(
+            notificationChannel
+        );
+
+        notificationChannel = null;
+    }
+
+    notificationChannel = supabaseClient
+        .channel(
+            "notifications-" +
+            currentUserId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "INSERT",
+                schema: "public",
+                table: "messages",
+                filter:
+                    "receiver_id=eq." +
+                    currentUserId
+            },
+            async function (payload) {
+
+                const message =
+                    payload.new;
+
+                // Ignorar mensajes propios
+                if (
+                    message.sender_id ===
+                    currentUserId
+                ) {
+                    return;
+                }
+
+                console.log(
+                    "🔔 Nuevo mensaje:",
+                    message
+                );
+
+                // Buscar perfil del remitente
+                const {
+                    data: person,
+                    error
+                } = await supabaseClient
+                    .from("profiles")
+                    .select(`
+                        id,
+                        username,
+                        display_name,
+                        avatar_url
+                    `)
+                    .eq(
+                        "id",
+                        message.sender_id
+                    )
+                    .single();
+
+                if (error || !person) {
+
+                    console.error(
+                        "❌ Error obteniendo remitente:",
+                        error
+                    );
+
+                    return;
+                }
+
+                showMessageNotification(
+                    person,
+                    message
+                );
+            }
+        )
+        .subscribe(function (status) {
+
+            console.log(
+                "🔔 Realtime notificaciones:",
+                status
+            );
+
+        });
+}
 // =========================================
 // MOSTRAR PANTALLAS
 // =========================================
@@ -721,11 +955,12 @@ async function loadProfile() {
 
 
     console.log(
-        "💚 Perfil cargado correctamente."
-    );
+    "💚 Perfil cargado correctamente."
+);
 
+showHome();
 
-    showHome();
+startMessageNotifications();
 }
 
 
@@ -3633,14 +3868,27 @@ function openFriendProfile(person) {
 
 function openChat(person) {
 
-    // Si ya existe un chat abierto, lo cerramos
-    const existingChat =
-        document.getElementById("revibeChat");
+    console.log("💬 OPEN CHAT EJECUTADO:", person);
 
-    if (existingChat) {
-        existingChat.remove();
-    }
+   // Si ya existe un canal de chat,
+ // lo cerramos correctamente
+if (chatChannel) {
 
+    supabaseClient.removeChannel(
+        chatChannel
+    );
+
+    chatChannel = null;
+}
+
+// Si ya existe un chat abierto,
+// lo cerramos
+const existingChat =
+    document.getElementById("revibeChat");
+
+if (existingChat) {
+    existingChat.remove();
+}
 
     // =========================================
     // CONTENEDOR PRINCIPAL
@@ -3649,17 +3897,23 @@ function openChat(person) {
     const chat =
         document.createElement("div");
 
+        chat.dataset.personId =
+    person.id;
+
     chat.id =
         "revibeChat";
+
+        
 
         // =========================================
 // ⚡ CANAL REALTIME DEL CHAT
 // =========================================
 
+chat.id =
+    "revibeChat";
 
-    chat.className =
-        "revibe-chat";
-
+chat.className =
+    "revibe-chat";
 
     // =========================================
     // HEADER
@@ -4094,6 +4348,8 @@ chatChannel = supabaseClient
 
     });
 
+    
+
     // =========================================
     // ÁREA DE ESCRIBIR
     // =========================================
@@ -4139,6 +4395,8 @@ chatChannel = supabaseClient
     sendButton.title =
         "Enviar";
 
+
+        
        // =========================================
 // ENVIAR MENSAJE
 // =========================================
@@ -4335,6 +4593,10 @@ input.addEventListener(
     chat.appendChild(composer);
 
     document.body.appendChild(chat);
+    console.log(
+    "🟢 CHAT AGREGADO AL DOM:",
+    document.getElementById("revibeChat")
+);
 
 
     // =========================================
@@ -5233,21 +5495,29 @@ supabaseClient.auth.onAuthStateChange(
 
 
         if (
-            event ===
-            "SIGNED_OUT"
-        ) {
+    event ===
+    "SIGNED_OUT"
+) {
 
-            currentUserId =
-                null;
+    // 🔔 Cerrar canal de notificaciones
+    if (notificationChannel) {
 
+        supabaseClient.removeChannel(
+            notificationChannel
+        );
 
-            currentProfile =
-                null;
+        notificationChannel = null;
+    }
 
+    currentUserId =
+        null;
 
-            showLogin();
+    currentProfile =
+        null;
 
-        }
+    showLogin();
+
+}
 
     }
 );
