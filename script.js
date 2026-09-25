@@ -164,6 +164,8 @@ let chatChannel = null;
 
 let notificationChannel = null;
 
+let unreadCounts = {};
+
 // =========================================// 🔔 NOTIFICACIÓN DE MENSAJE NUEVO
 // =========================================
 
@@ -2361,7 +2363,71 @@ async function loadFriends() {
     }
 }
 
+// =========================================
+// 💬 CARGAR MENSAJES NO LEÍDOS
+// =========================================
 
+async function loadUnreadCounts() {
+
+    unreadCounts = {};
+
+    if (!currentUserId) {
+        return;
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("messages")
+            .select("sender_id")
+            .eq(
+                "receiver_id",
+                currentUserId
+            )
+            .is(
+                "read_at",
+                null
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        (data || []).forEach(
+            function (message) {
+
+                if (
+                    !unreadCounts[
+                        message.sender_id
+                    ]
+                ) {
+                    unreadCounts[
+                        message.sender_id
+                    ] = 0;
+                }
+
+                unreadCounts[
+                    message.sender_id
+                ]++;
+            }
+        );
+
+        console.log(
+            "💬 Mensajes no leídos:",
+            unreadCounts
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error cargando mensajes no leídos:",
+            error
+        );
+    }
+}
 // =========================================
 // MOSTRAR AMIGOS EN INICIO
 // =========================================
@@ -2498,11 +2564,14 @@ function renderFriendsHome(
 
         if (!person) return;
 
+        
+
         friendsList.appendChild(
             createFriendCard(
-                person,
-                friendship
-            )
+    person,
+    friendship,
+    unreadCounts[person.id] || 0
+)
         );
     });
 }
@@ -2686,12 +2755,15 @@ async function loadFriends() {
         }
 
         currentUserId =
-            sessionData.session.user.id;
+    sessionData.session.user.id;
 
-        console.log(
-            "👤 Usuario actual:",
-            currentUserId
-        );
+// 💬 Cargar mensajes no leídos
+await loadUnreadCounts();
+
+console.log(
+    "👤 Usuario actual:",
+    currentUserId
+);
 
         const {
             data: relationships,
@@ -2801,136 +2873,6 @@ async function loadFriends() {
     }
 }
 
-
-// =========================================
-// MOSTRAR AMIGOS
-// =========================================
-
-function renderFriendsHome(
-    accepted,
-    received,
-    profiles
-) {
-
-    if (!friendsList) return;
-
-    friendsList.innerHTML = "";
-
-    // Solicitudes recibidas
-    if (received.length > 0) {
-
-        const requestsBox =
-            document.createElement("div");
-
-        requestsBox.className =
-            "friend-requests-box";
-
-        const title =
-            document.createElement("h3");
-
-        title.textContent =
-            `💌 Solicitudes (${received.length})`;
-
-        requestsBox.appendChild(title);
-
-        received.forEach(request => {
-
-            const person =
-                profiles.find(
-                    profile =>
-                        profile.id ===
-                        request.requester_id
-                );
-
-            if (!person) return;
-
-            requestsBox.appendChild(
-                createFriendRequestCard(
-                    request,
-                    person
-                )
-            );
-        });
-
-        friendsList.appendChild(
-            requestsBox
-        );
-    }
-
-    // Sin amigos
-    if (accepted.length === 0) {
-
-        const empty =
-            document.createElement("div");
-
-        empty.className =
-            "empty-friends";
-
-        empty.innerHTML = `
-            <div class="empty-friends-icon">
-                👥
-            </div>
-
-            <h3>Aún no tienes amigos</h3>
-
-            <p>
-                Agrega a alguien y empieza
-                a crear tu vibra. ✨
-            </p>
-
-            <button
-                type="button"
-                class="primary-button"
-                id="dynamicAddFriendButton"
-            >
-                💚 AGREGAR MI PRIMER AMIGO
-            </button>
-        `;
-
-        const button =
-            empty.querySelector(
-                "#dynamicAddFriendButton"
-            );
-
-        if (button) {
-            button.addEventListener(
-                "click",
-                openFriendModal
-            );
-        }
-
-        friendsList.appendChild(empty);
-
-        return;
-    }
-
-    
-   
-
-    // Mostrar amigos
-    accepted.forEach(friendship => {
-
-        const friendId =
-            friendship.requester_id === currentUserId
-                ? friendship.receiver_id
-                : friendship.requester_id;
-
-        const person =
-            profiles.find(
-                profile =>
-                    profile.id === friendId
-            );
-
-        if (!person) return;
-
-        friendsList.appendChild(
-            createFriendCard(
-                person,
-                friendship
-            )
-        );
-    });
-}
 
 
 // =========================================
@@ -3381,7 +3323,8 @@ async function acceptFriendRequest(
 
 function createFriendCard(
     person,
-    friendship
+    friendship,
+    unreadCount = 0
 ) {
 
       
@@ -3661,10 +3604,54 @@ card.appendChild(avatar);
 card.appendChild(info);
 
 
+// =========================================
+// 💬 MENSAJES NO LEÍDOS
+// =========================================
+
+const unreadBadge =
+    document.createElement("span");
+
+unreadBadge.className =
+    "friend-unread-badge";
+
+unreadBadge.dataset.friendId =
+    person.id;
+
+if (unreadCount > 0) {
+
+    unreadBadge.textContent =
+        unreadCount > 99
+            ? "99+"
+            : unreadCount;
+
+    unreadBadge.style.display =
+        "inline-flex";
+
+} else {
+
+    unreadBadge.style.display =
+        "none";
+}
+
+
+// =========================================
+// AGREGAR ELEMENTOS
+// =========================================
+
+card.appendChild(avatar);
+
+card.appendChild(info);
+
 card.appendChild(actions);
+
+// El contador va encima de la tarjeta,
+// cerca del botón ⋮
+card.appendChild(unreadBadge);
 
 return card;
 }
+
+
 
 function openFriendProfile(person) {
 
