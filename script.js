@@ -2369,8 +2369,6 @@ async function loadFriends() {
 
 async function loadUnreadCounts() {
 
-    unreadCounts = {};
-
     if (!currentUserId) {
         return;
     }
@@ -2382,38 +2380,28 @@ async function loadUnreadCounts() {
             error
         } = await supabaseClient
             .from("messages")
-            .select("sender_id")
-            .eq(
-                "receiver_id",
-                currentUserId
-            )
-            .is(
-                "read_at",
-                null
-            );
+            .select("id, sender_id, receiver_id, read_at")
+            .eq("receiver_id", currentUserId)
+            .is("read_at", null);
 
         if (error) {
             throw error;
         }
 
-        (data || []).forEach(
-            function (message) {
+        // Reiniciar contadores
+        unreadCounts = {};
 
-                if (
-                    !unreadCounts[
-                        message.sender_id
-                    ]
-                ) {
-                    unreadCounts[
-                        message.sender_id
-                    ] = 0;
-                }
+        // Contar SOLO mensajes no leídos
+        (data || []).forEach(function (message) {
 
-                unreadCounts[
-                    message.sender_id
-                ]++;
+            if (!message.sender_id) {
+                return;
             }
-        );
+
+            unreadCounts[message.sender_id] =
+                (unreadCounts[message.sender_id] || 0) + 1;
+
+        });
 
         console.log(
             "💬 Mensajes no leídos:",
@@ -2426,6 +2414,8 @@ async function loadUnreadCounts() {
             "❌ Error cargando mensajes no leídos:",
             error
         );
+
+        unreadCounts = {};
     }
 }
 // =========================================
@@ -3848,6 +3838,63 @@ function openFriendProfile(person) {
     );
 }
 
+// =========================================
+// 👀 MARCAR MENSAJES COMO LEÍDOS
+// =========================================
+
+async function markMessagesAsRead(friendId) {
+
+    if (!currentUserId || !friendId) {
+        return;
+    }
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient
+            .from("messages")
+            .update({
+                read_at: new Date().toISOString()
+            })
+            .eq("sender_id", friendId)
+            .eq("receiver_id", currentUserId)
+            .is("read_at", null);
+
+        if (error) {
+            throw error;
+        }
+
+        // Actualizar contador local
+        unreadCounts[friendId] = 0;
+
+        // Buscar el contador de esa tarjeta
+        const badge =
+            document.querySelector(
+                `.friend-unread-badge[data-friend-id="${friendId}"]`
+            );
+
+        // Ocultarlo
+        if (badge) {
+
+            badge.textContent = "";
+
+            badge.style.display = "none";
+        }
+
+        console.log(
+            "👀 Mensajes marcados como leídos:",
+            friendId
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error marcando mensajes como leídos:",
+            error
+        );
+    }
+}
 
 // =========================================
 // ABRIR CHAT
@@ -4229,6 +4276,9 @@ async function loadChatMessages() {
 }
 loadChatMessages();
 
+// 👀 Marcar como leídos los mensajes recibidos
+markMessagesAsRead(person.id);
+
 // =========================================
 // ⚡ RECIBIR MENSAJES EN TIEMPO REAL
 // =========================================
@@ -4336,52 +4386,118 @@ chatChannel = supabaseClient
     });
 
     
+// =========================================
+// 🛠️ BARRA DE HERRAMIENTAS DEL CHAT
+// =========================================
 
-    // =========================================
-    // ÁREA DE ESCRIBIR
-    // =========================================
+const composer =
+    document.createElement("div");
 
-    const composer =
-        document.createElement("div");
-
-    composer.className =
-        "revibe-chat-composer";
-
-
-    const input =
-        document.createElement("input");
-
-    input.type =
-        "text";
-
-    input.className =
-        "revibe-chat-input";
-
-    input.placeholder =
-        "Escribe un mensaje...";
-
-    input.maxLength =
-        1000;
-
-    input.autocomplete =
-        "off";
+composer.className =
+    "revibe-chat-composer";
 
 
-    const sendButton =
-        document.createElement("button");
+// =========================================
+// 😊 BOTÓN EMOJIS
+// =========================================
 
-    sendButton.type =
-        "button";
+const emojiButton =
+    document.createElement("button");
 
-    sendButton.className =
-        "revibe-chat-send";
+emojiButton.type =
+    "button";
 
-    sendButton.textContent =
-        "➤";
+emojiButton.className =
+    "revibe-chat-tool";
 
-    sendButton.title =
-        "Enviar";
+emojiButton.textContent =
+    "😊";
 
+emojiButton.title =
+    "Emojis";
+
+
+// =========================================
+// 📎 BOTÓN ARCHIVOS
+// =========================================
+
+const fileButton =
+    document.createElement("button");
+
+fileButton.type =
+    "button";
+
+fileButton.className =
+    "revibe-chat-tool";
+
+fileButton.textContent =
+    "📎";
+
+fileButton.title =
+    "Adjuntar archivo";
+
+
+// =========================================
+// 💚 BOTÓN ZUMBIDO
+// =========================================
+
+const buzzButton =
+    document.createElement("button");
+
+buzzButton.type =
+    "button";
+
+buzzButton.className =
+    "revibe-chat-tool revibe-chat-buzz";
+
+buzzButton.textContent =
+    "〰️";
+
+buzzButton.title =
+    "Enviar vibra";
+
+
+// =========================================
+// CAMPO DE MENSAJE
+// =========================================
+
+const input =
+    document.createElement("input");
+
+input.type =
+    "text";
+
+input.className =
+    "revibe-chat-input";
+
+input.placeholder =
+    "Escribe un mensaje...";
+
+input.maxLength =
+    1000;
+
+input.autocomplete =
+    "off";
+
+
+// =========================================
+// BOTÓN ENVIAR
+// =========================================
+
+const sendButton =
+    document.createElement("button");
+
+sendButton.type =
+    "button";
+
+sendButton.className =
+    "revibe-chat-send";
+
+sendButton.textContent =
+    "➤";
+
+sendButton.title =
+    "Enviar";
 
         
        // =========================================
@@ -4564,9 +4680,41 @@ input.addEventListener(
 
 
 
-    composer.appendChild(input);
+// =========================================
+// 🛠️ BARRA SUPERIOR DEL COMPOSER
+// =========================================
 
-    composer.appendChild(sendButton);
+const toolbar =
+    document.createElement("div");
+
+toolbar.className =
+    "revibe-chat-toolbar";
+
+toolbar.appendChild(emojiButton);
+toolbar.appendChild(fileButton);
+toolbar.appendChild(buzzButton);
+
+
+// =========================================
+// ✏️ CAJA DE TEXTO
+// =========================================
+
+const inputRow =
+    document.createElement("div");
+
+inputRow.className =
+    "revibe-chat-input-row";
+
+inputRow.appendChild(input);
+inputRow.appendChild(sendButton);
+
+
+// =========================================
+// ARMAR COMPOSER
+// =========================================
+
+composer.appendChild(toolbar);
+composer.appendChild(inputRow);
 
 
     // =========================================
