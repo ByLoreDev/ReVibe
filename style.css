@@ -3392,3 +3392,61 @@ footer span {
     font-size: 12px;
     opacity: 0.7;
 }
+/* =========================================
+   🚨 INTERRUPTOR DE URGENTES
+========================================= */
+
+.revibe-urgent-switch {
+    margin-left: auto;
+    height: 25px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #d6e9e1;
+    border-radius: 999px;
+    background: #f7fbf9;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.revibe-urgent-light {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #20bd7d;
+    box-shadow:
+        0 0 0 3px rgba(32, 189, 125, 0.12);
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.revibe-urgent-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #587268;
+    white-space: nowrap;
+}
+
+.revibe-urgent-switch:hover {
+    background: #edf7f3;
+}
+
+.revibe-urgent-switch.disabled {
+    background: #fafafa;
+    border-color: #e3e3e3;
+}
+
+.revibe-urgent-switch.disabled
+.revibe-urgent-light {
+    background: #b9b9b9;
+    box-shadow: none;
+}
+
+.revibe-urgent-switch.disabled
+.revibe-urgent-label {
+    color: #999;
+}

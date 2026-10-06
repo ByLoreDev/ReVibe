@@ -389,39 +389,99 @@ async function startMessageNotifications() {
                 // =========================================
 // 〰️ RECIBIR VIBRA
 // =========================================
-
+// 🚨 MENSAJE URGENTE
 if (message.message_type === "buzz") {
 
     console.log(
-        "🚨 Vibra recibida de:",
+        "🚨 Urgente recibido de:",
         person.display_name ||
         person.username
     );
-playBuzzSound();
-    // Abrir el chat automáticamente
+
+
+    // =========================================
+    // 🔐 COMPROBAR SI LOS URGENTES ESTÁN ACTIVADOS
+    // =========================================
+
+    const {
+        data: friendship,
+        error: friendshipError
+    } = await supabaseClient
+        .from("friendships")
+        .select(
+            "urgent_enabled"
+        )
+        .or(
+            `and(requester_id.eq.${currentUserId},receiver_id.eq.${message.sender_id}),and(requester_id.eq.${message.sender_id},receiver_id.eq.${currentUserId})`
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if (friendshipError) {
+
+        console.error(
+            "❌ Error comprobando urgentes:",
+            friendshipError
+        );
+
+        // Por seguridad NO bloqueamos
+        // si no podemos comprobar la configuración.
+
+    } else if (
+        friendship &&
+        friendship.urgent_enabled === false
+    ) {
+
+        console.log(
+            "🔕 Urgente bloqueado para:",
+            person.display_name ||
+            person.username
+        );
+
+        return;
+    }
+
+
+    // =========================================
+    // 🚨 URGENTE PERMITIDO
+    // =========================================
+
+    console.log(
+        "🚨 Ejecutando urgente."
+    );
+
+
+    playBuzzSound();
+
+
     openChat(person);
 
-    // Esperar a que el chat aparezca en el DOM
+
     setTimeout(function () {
 
         const buzzChat =
-            document.getElementById("revibeChat");
+            document.getElementById(
+                "revibeChat"
+            );
 
         if (!buzzChat) {
             return;
         }
 
-        // Reiniciar la animación
+
         buzzChat.classList.remove(
             "revibe-chat-buzz-animation"
         );
 
+
         void buzzChat.offsetWidth;
 
-        // Hacer vibrar la ventana
+
         buzzChat.classList.add(
             "revibe-chat-buzz-animation"
         );
+
 
         setTimeout(function () {
 
@@ -433,9 +493,9 @@ playBuzzSound();
 
     }, 150);
 
+
     return;
 }
-
                 showMessageNotification(
                     person,
                     message
@@ -4829,9 +4889,7 @@ loadChatMessages();
 // 👀 Marcar como leídos los mensajes recibidos
 markMessagesAsRead(person.id);
 
-// =========================================
 // ⚡ RECIBIR MENSAJES EN TIEMPO REAL
-// =========================================
 
 chatChannel = supabaseClient
     .channel(
@@ -4861,12 +4919,11 @@ chatChannel = supabaseClient
 if (message.message_type === "buzz") {
 
     console.log(
-        "🚨 Vibra recibida:",
-        message
+        "🚨 Urgente recibido: gestionado por notificaciones globales."
     );
 
-    triggerBuzzAnimation();
-
+    return;
+}
 
     // =========================================
 // 💚 AVISO DE VIBRA RECIBIDA
@@ -4914,10 +4971,7 @@ function showBuzzReceived() {
 
     }, 2500);
 }
-    showBuzzReceived();
-
-    return;
-}
+   
 
             // Solo mostrar mensajes de la persona
             // con la que estamos conversando
@@ -5602,6 +5656,215 @@ toolbar.appendChild(emojiButton);
 toolbar.appendChild(fileButton);
 toolbar.appendChild(buzzButton);
 
+
+// 🚨 Interruptor de mensajes urgentes
+const urgentSwitch =
+    document.createElement("button");
+
+urgentSwitch.type = "button";
+
+urgentSwitch.className =
+    "revibe-urgent-switch";
+
+urgentSwitch.title =
+    "Permitir mensajes urgentes";
+
+urgentSwitch.innerHTML = `
+    <span class="revibe-urgent-light"></span>
+    <span class="revibe-urgent-label">
+        Urgentes
+    </span>
+`;
+
+toolbar.appendChild(urgentSwitch);
+
+
+// =========================================
+// 🚨 CARGAR CONFIGURACIÓN DE URGENTES
+// =========================================
+
+let urgentEnabled = true;
+let friendshipId = null;
+
+
+async function loadUrgentSetting() {
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("friendships")
+            .select(
+                "id, urgent_enabled"
+            )
+            .or(
+                `and(requester_id.eq.${currentUserId},receiver_id.eq.${person.id}),and(requester_id.eq.${person.id},receiver_id.eq.${currentUserId})`
+            )
+            .limit(1)
+            .maybeSingle();
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (data) {
+
+            friendshipId =
+                data.id;
+
+            urgentEnabled =
+                data.urgent_enabled !== false;
+
+        } else {
+
+            // Por seguridad:
+            // si no encontramos la amistad,
+            // dejamos urgentes activados.
+            urgentEnabled = true;
+        }
+
+
+        updateUrgentSwitch();
+
+
+        console.log(
+            "🚨 Urgentes para",
+            person.display_name ||
+            person.username,
+            ":",
+            urgentEnabled
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error cargando configuración de urgentes:",
+            error
+        );
+
+        urgentEnabled = true;
+
+        updateUrgentSwitch();
+    }
+}
+
+
+// =========================================
+// 🚨 ACTUALIZAR VISUAL DEL SWITCH
+// =========================================
+
+function updateUrgentSwitch() {
+
+    if (urgentEnabled) {
+
+        urgentSwitch.classList.remove(
+            "disabled"
+        );
+
+        urgentSwitch.title =
+            "Urgentes activados";
+
+    } else {
+
+        urgentSwitch.classList.add(
+            "disabled"
+        );
+
+        urgentSwitch.title =
+            "Urgentes desactivados";
+    }
+}
+
+
+// =========================================
+// 🚨 ACTIVAR / DESACTIVAR
+// =========================================
+
+urgentSwitch.addEventListener(
+    "click",
+    async function () {
+
+        if (!friendshipId) {
+
+            console.warn(
+                "⚠️ No se encontró la amistad."
+            );
+
+            return;
+        }
+
+
+        const newValue =
+            !urgentEnabled;
+
+
+        // Cambiamos visualmente de inmediato
+        urgentEnabled =
+            newValue;
+
+        updateUrgentSwitch();
+
+
+        try {
+
+            const {
+                error
+            } = await supabaseClient
+                .from("friendships")
+                .update({
+                    urgent_enabled:
+                        newValue
+                })
+                .eq(
+                    "id",
+                    friendshipId
+                );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            console.log(
+                newValue
+                    ? "🚨 Urgentes activados."
+                    : "🔕 Urgentes desactivados."
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error guardando configuración:",
+                error
+            );
+
+
+            // Si falló, regresamos
+            // al estado anterior
+            urgentEnabled =
+                !newValue;
+
+            updateUrgentSwitch();
+
+
+            alert(
+                "No se pudo guardar la configuración de urgentes."
+            );
+        }
+
+    }
+);
+
+
+// Cargar configuración al abrir el chat
+loadUrgentSetting();
 
 // =========================================
 // ✏️ CAJA DE TEXTO
