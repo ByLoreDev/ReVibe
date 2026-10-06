@@ -393,7 +393,7 @@ async function startMessageNotifications() {
 if (message.message_type === "buzz") {
 
     console.log(
-        "〰️ Vibra recibida de:",
+        "🚨 Vibra recibida de:",
         person.display_name ||
         person.username
     );
@@ -4861,7 +4861,7 @@ chatChannel = supabaseClient
 if (message.message_type === "buzz") {
 
     console.log(
-        "〰️ Vibra recibida:",
+        "🚨 Vibra recibida:",
         message
     );
 
@@ -4890,7 +4890,7 @@ function showBuzzReceived() {
         "revibe-buzz-notice";
 
     notice.textContent =
-        "〰️ ¡Te mandaron una vibra!";
+        "🚨 ¡Te mandaron una vibra!";
 
     chat.appendChild(notice);
 
@@ -5223,13 +5223,10 @@ buzzButton.type =
     "button";
 
 buzzButton.className =
-    "revibe-chat-tool revibe-chat-buzz";
+    "revibe-chat-tool revibe-chat-urgent";
 
-buzzButton.textContent =
-    "〰️";
-
-buzzButton.title =
-    "Enviar vibra";
+buzzButton.textContent = "🚨";
+buzzButton.title = "Enviar mensaje urgente";
 
 // =========================================
 // 〰️ ENVIAR ZUMBIDO / VIBRA
@@ -5259,7 +5256,7 @@ async function sendBuzz() {
         }
 
         console.log(
-            "〰️ Vibra enviada."
+            "🚨 Vibra enviada."
         );
 
     } catch (error) {
