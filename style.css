@@ -3114,3 +3114,146 @@ footer span {
 
     flex: 0 0 44px;
 }
+/* =========================================
+   😊 PICKER DE EMOJIS REVIBE
+   ========================================= */
+
+.revibe-chat-composer {
+    position: relative;
+}
+
+/* Panel */
+
+.revibe-emoji-picker {
+    width: min(330px, calc(100vw - 30px));
+
+    max-height: 190px;
+
+    padding: 10px;
+
+    margin-bottom: 4px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(8, 1fr);
+
+    gap: 3px;
+
+    background: #ffffff;
+
+    border: 1px solid #cfe5dc;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 8px 24px rgba(35, 75, 58, 0.16);
+
+    overflow-y: auto;
+
+        align-self: flex-start;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Emoji */
+
+.revibe-emoji-item {
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: transparent;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        background 0.12s ease,
+        transform 0.12s ease;
+}
+
+.revibe-emoji-item:hover {
+    background: #eaf6f1;
+
+    transform: scale(1.12);
+}
+
+.revibe-emoji-item:active {
+    transform: scale(0.92);
+}
+
+/* Móvil */
+
+@media (max-width: 600px) {
+
+    .revibe-emoji-picker {
+        width: calc(100vw - 30px);
+
+        grid-template-columns:
+            repeat(8, 1fr);
+    }
+}
+
+/* =========================================
+   〰️ AVISO DE VIBRA
+   ========================================= */
+
+.revibe-chat {
+    position: relative;
+}
+
+.revibe-buzz-notice {
+    position: absolute;
+
+    left: 50%;
+    top: 75px;
+
+    transform:
+        translateX(-50%)
+        translateY(-10px);
+
+    z-index: 3000;
+
+    padding: 9px 15px;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #cfe5dc;
+
+    box-shadow:
+        0 6px 20px rgba(35, 75, 58, 0.18);
+
+    color: #3f6e5d;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+
+    pointer-events: none;
+}
+
+.revibe-buzz-notice.show {
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}

@@ -2382,6 +2382,7 @@ async function loadUnreadCounts() {
             .from("messages")
             .select("id, sender_id, receiver_id, read_at")
             .eq("receiver_id", currentUserId)
+            .eq("message_type", "text")
             .is("read_at", null);
 
         if (error) {
@@ -4304,6 +4305,71 @@ chatChannel = supabaseClient
 
             const message = payload.new;
 
+            // =========================================
+// 〰️ RECIBIR VIBRA
+// =========================================
+
+if (message.message_type === "buzz") {
+
+    console.log(
+        "〰️ Vibra recibida:",
+        message
+    );
+
+    triggerBuzzAnimation();
+
+
+    // =========================================
+// 💚 AVISO DE VIBRA RECIBIDA
+// =========================================
+
+function showBuzzReceived() {
+
+    const existing =
+        chat.querySelector(
+            ".revibe-buzz-notice"
+        );
+
+    if (existing) {
+        existing.remove();
+    }
+
+    const notice =
+        document.createElement("div");
+
+    notice.className =
+        "revibe-buzz-notice";
+
+    notice.textContent =
+        "〰️ ¡Te mandaron una vibra!";
+
+    chat.appendChild(notice);
+
+    setTimeout(function () {
+
+        notice.classList.add("show");
+
+    }, 10);
+
+    setTimeout(function () {
+
+        notice.classList.remove("show");
+
+        setTimeout(function () {
+
+            if (notice.parentNode) {
+                notice.remove();
+            }
+
+        }, 250);
+
+    }, 2500);
+}
+    showBuzzReceived();
+
+    return;
+}
+
             // Solo mostrar mensajes de la persona
             // con la que estamos conversando
             if (message.sender_id !== person.id) {
@@ -4499,7 +4565,94 @@ sendButton.textContent =
 sendButton.title =
     "Enviar";
 
+
+    // =========================================
+// 😊 PANEL DE EMOJIS REVIBE
+// =========================================
+
+const emojiPicker =
+    document.createElement("div");
+
+emojiPicker.className =
+    "revibe-emoji-picker";
+
+emojiPicker.style.display =
+    "none";
+
+const emojis = [
+    "😀", "😃", "😄", "😁", "😆", "😂", "🤣", "😊",
+    "😍", "🥰", "😘", "😎", "🤩", "🥳", "😭", "😅",
+    "😡", "😱", "😴", "🤔", "🙄", "😏", "🥺", "🤗",
+    "😇", "🤪", "😜", "😋", "🤭", "😮", "😢", "😤",
+    "❤️", "💕", "💖", "💚", "💙", "💜", "🖤", "🤍",
+    "⭐", "✨", "🌸", "☕", "🎵", "🎉", "🎂", "🔥"
+];
+
+emojis.forEach(function(emoji) {
+
+    const button =
+        document.createElement("button");
+
+    button.type =
+        "button";
+
+    button.className =
+        "revibe-emoji-item";
+
+    button.textContent =
+        emoji;
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            input.focus();
+
+            const start =
+                input.selectionStart ??
+                input.value.length;
+
+            const end =
+                input.selectionEnd ??
+                input.value.length;
+
+            input.value =
+                input.value.slice(0, start) +
+                emoji +
+                input.value.slice(end);
+
+            const newPosition =
+                start + emoji.length;
+
+            input.setSelectionRange(
+                newPosition,
+                newPosition
+            );
+
+            input.focus();
+        }
+    );
+
+    emojiPicker.appendChild(button);
+});
         
+
+// =========================================
+// 😊 ABRIR / CERRAR EMOJIS
+// =========================================
+
+emojiButton.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+        emojiPicker.style.display =
+            emojiPicker.style.display === "none"
+                ? "grid"
+                : "none";
+    }
+);
        // =========================================
 // ENVIAR MENSAJE
 // =========================================
@@ -4713,7 +4866,10 @@ inputRow.appendChild(sendButton);
 // ARMAR COMPOSER
 // =========================================
 
+composer.appendChild(emojiPicker);
+
 composer.appendChild(toolbar);
+
 composer.appendChild(inputRow);
 
 
