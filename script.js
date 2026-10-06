@@ -3951,7 +3951,6 @@ async function markMessagesAsRead(friendId) {
 // =========================================
 // 🔊 SONIDO DE VIBRA REVIBE
 // =========================================
-
 function playBuzzSound() {
 
     try {
@@ -3975,13 +3974,14 @@ function playBuzzSound() {
             audioContext.currentTime;
 
 
-        // 〰️ Crea un zumbido con barrido de frecuencia
-        function createBuzz(
+        // 🎛️ Crea un sonido corto y juguetón
+        function makeTone(
             start,
             duration,
             startFreq,
             endFreq,
-            volume
+            volume,
+            type = "triangle"
         ) {
 
             const oscillator =
@@ -3990,7 +3990,7 @@ function playBuzzSound() {
             const gain =
                 audioContext.createGain();
 
-            oscillator.type = "sawtooth";
+            oscillator.type = type;
 
             oscillator.frequency.setValueAtTime(
                 startFreq,
@@ -4009,7 +4009,7 @@ function playBuzzSound() {
 
             gain.gain.exponentialRampToValueAtTime(
                 volume,
-                start + 0.04
+                start + 0.025
             );
 
             gain.gain.exponentialRampToValueAtTime(
@@ -4025,57 +4025,129 @@ function playBuzzSound() {
             oscillator.start(start);
 
             oscillator.stop(
-                start + duration + 0.05
+                start + duration + 0.03
             );
         }
 
 
-        // 〰️ Zumbido 1
-        createBuzz(
+        // 📳 ZUUUUM inicial
+        makeTone(
             now,
             0.55,
-            170,
-            430,
-            0.18
+            260,
+            720,
+            0.22,
+            "triangle"
         );
 
 
-        // 〰️ Zumbido 2
-        createBuzz(
-            now + 0.65,
-            0.55,
-            240,
+        // ⚡ Brr-brr-brr
+        makeTone(
+            now + 0.42,
+            0.16,
             520,
-            0.20
+            820,
+            0.24,
+            "square"
+        );
+
+        makeTone(
+            now + 0.61,
+            0.16,
+            760,
+            500,
+            0.24,
+            "square"
+        );
+
+        makeTone(
+            now + 0.80,
+            0.16,
+            520,
+            850,
+            0.24,
+            "square"
         );
 
 
-        // 〰️ Zumbido 3
-        createBuzz(
-            now + 1.30,
-            0.60,
-            180,
-            470,
-            0.18
-        );
-
-
-        // 〰️ Pequeño remate
-        createBuzz(
-            now + 2.00,
+        // 😜 Segundo ZUUUUM, más juguetón
+        makeTone(
+            now + 1.05,
             0.55,
-            280,
-            600,
-            0.16
+            350,
+            950,
+            0.22,
+            "triangle"
         );
 
 
-        // 🔊 Cerramos después de terminar
+        // ⚡ Mini vibración
+        makeTone(
+            now + 1.48,
+            0.14,
+            700,
+            1000,
+            0.22,
+            "square"
+        );
+
+        makeTone(
+            now + 1.65,
+            0.14,
+            950,
+            650,
+            0.22,
+            "square"
+        );
+
+        makeTone(
+            now + 1.82,
+            0.14,
+            680,
+            1050,
+            0.22,
+            "square"
+        );
+
+
+        // 🚀 Remate ReVibe
+        makeTone(
+            now + 2.05,
+            0.65,
+            300,
+            1100,
+            0.25,
+            "triangle"
+        );
+
+
+        // ✨ Dos pequeños golpes finales
+        makeTone(
+            now + 2.55,
+            0.12,
+            1100,
+            750,
+            0.18,
+            "triangle"
+        );
+
+        makeTone(
+            now + 2.70,
+            0.12,
+            900,
+            600,
+            0.15,
+            "triangle"
+        );
+
+
+        // 🔊 Cerramos al terminar
         setTimeout(function () {
 
             audioContext.close();
 
-        }, 3000);
+        }, 3200);
+
 
     } catch (error) {
 
@@ -4085,6 +4157,7 @@ function playBuzzSound() {
         );
 
     }
+
 }
 // =========================================
 // ABRIR CHAT
@@ -4377,6 +4450,241 @@ chat.className =
     messages.appendChild(empty);
 
     // =========================================
+// 📎 MOSTRAR ARCHIVOS EN EL CHAT
+// =========================================
+
+async function createFileBubble(message) {
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        message.sender_id === currentUserId
+            ? "revibe-message sent revibe-file-message"
+            : "revibe-message received revibe-file-message";
+
+    bubble.dataset.messageId =
+        message.id;
+
+
+    // 🔐 Crear URL temporal segura
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .storage
+        .from("chat-files")
+        .createSignedUrl(
+            message.file_path,
+            3600
+        );
+
+
+    if (error || !data?.signedUrl) {
+
+        console.error(
+            "❌ No se pudo obtener el archivo:",
+            error
+        );
+
+        const errorText =
+            document.createElement("div");
+
+        errorText.className =
+            "revibe-file-error";
+
+        errorText.textContent =
+            "📎 No se pudo cargar el archivo";
+
+        bubble.appendChild(errorText);
+
+        return bubble;
+    }
+
+
+    const fileUrl =
+        data.signedUrl;
+
+
+    // 📁 Contenedor
+    const fileCard =
+        document.createElement("div");
+
+    fileCard.className =
+        "revibe-file-card";
+
+
+    // 🖼️ IMÁGENES
+    if (
+        message.file_type &&
+        message.file_type.startsWith("image/")
+    ) {
+
+        const image =
+            document.createElement("img");
+
+        image.src =
+            fileUrl;
+
+        image.alt =
+            message.file_name || "Imagen";
+
+        image.className =
+            "revibe-file-image";
+
+        image.addEventListener(
+            "click",
+            function () {
+
+                window.open(
+                    fileUrl,
+                    "_blank"
+                );
+
+            }
+        );
+
+        fileCard.appendChild(image);
+
+
+    // 🎥 VIDEOS
+    } else if (
+        message.file_type &&
+        message.file_type.startsWith("video/")
+    ) {
+
+        const video =
+            document.createElement("video");
+
+        video.src =
+            fileUrl;
+
+        video.controls = true;
+
+        video.preload =
+            "metadata";
+
+        video.className =
+            "revibe-file-video";
+
+        fileCard.appendChild(video);
+
+
+    // 📄 OTROS ARCHIVOS
+    } else {
+
+        const icon =
+            document.createElement("div");
+
+        icon.className =
+            "revibe-file-icon";
+
+        icon.textContent =
+            "📎";
+
+
+        const information =
+            document.createElement("div");
+
+        information.className =
+            "revibe-file-information";
+
+
+        const name =
+            document.createElement("strong");
+
+        name.textContent =
+            message.file_name ||
+            "Archivo";
+
+
+        const size =
+            document.createElement("small");
+
+        size.textContent =
+            formatFileSize(
+                message.file_size
+            );
+
+
+        const openButton =
+            document.createElement("a");
+
+        openButton.href =
+            fileUrl;
+
+        openButton.target =
+            "_blank";
+
+        openButton.rel =
+            "noopener noreferrer";
+
+        openButton.className =
+            "revibe-file-open";
+
+        openButton.textContent =
+            "Abrir archivo";
+
+
+        information.appendChild(name);
+        information.appendChild(size);
+        information.appendChild(openButton);
+
+        fileCard.appendChild(icon);
+        fileCard.appendChild(information);
+    }
+
+
+    bubble.appendChild(fileCard);
+
+
+    // 🕐 Hora
+    const time =
+        document.createElement("small");
+
+    time.className =
+        "revibe-message-time";
+
+    time.textContent =
+        new Date(
+            message.created_at
+        ).toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    bubble.appendChild(time);
+
+
+    return bubble;
+}
+
+function formatFileSize(bytes) {
+
+    if (!bytes) {
+        return "";
+    }
+
+    if (bytes < 1024) {
+        return bytes + " B";
+    }
+
+    if (bytes < 1024 * 1024) {
+        return (
+            (bytes / 1024).toFixed(1) +
+            " KB"
+        );
+    }
+
+    return (
+        (bytes / (1024 * 1024)).toFixed(1) +
+        " MB"
+    );
+}
+    // =========================================
 // CARGAR MENSAJES
 // =========================================
 
@@ -4422,60 +4730,83 @@ async function loadChatMessages() {
 
         // Crear cada mensaje
 
-      data.forEach(function(message) {
+     data.forEach(async function(message) {
 
     // 〰️ Las vibras no se muestran como mensajes
-    if (message.message_type === "buzz") {
+    if (
+        message.message_type === "buzz"
+    ) {
         return;
     }
 
+
+    // 📎 ARCHIVO
+    if (
+        message.message_type === "file"
+    ) {
+
+        const bubble =
+            await createFileBubble(
+                message
+            );
+
+        messages.appendChild(
+            bubble
+        );
+
+        return;
+    }
+
+
+    // 💬 MENSAJE NORMAL
     const bubble =
         document.createElement("div");
 
-            bubble.className =
-                message.sender_id === currentUserId
-                    ? "revibe-message sent"
-                    : "revibe-message received";
+    bubble.className =
+        message.sender_id === currentUserId
+            ? "revibe-message sent"
+            : "revibe-message received";
 
-                    bubble.dataset.messageId =
-    message.id;
-
-
-            const text =
-                document.createElement("div");
-
-            text.className =
-                "revibe-message-text";
-
-            text.textContent =
-                message.content;
+    bubble.dataset.messageId =
+        message.id;
 
 
-            const time =
-                document.createElement("small");
+    const text =
+        document.createElement("div");
 
-            time.className =
-                "revibe-message-time";
+    text.className =
+        "revibe-message-text";
 
-            time.textContent =
-                new Date(
-                    message.created_at
-                ).toLocaleTimeString(
-                    [],
-                    {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    }
-                );
+    text.textContent =
+        message.content;
 
 
-            bubble.appendChild(text);
+    const time =
+        document.createElement("small");
 
-            bubble.appendChild(time);
+    time.className =
+        "revibe-message-time";
 
-            messages.appendChild(bubble);
+    time.textContent =
+        new Date(
+            message.created_at
+        ).toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
 
-        });
+
+    bubble.appendChild(text);
+    bubble.appendChild(time);
+
+    messages.appendChild(
+        bubble
+    );
+
+});
 
 
         // Ir al último mensaje
@@ -4720,7 +5051,167 @@ fileButton.textContent =
 fileButton.title =
     "Adjuntar archivo";
 
+// 📎 Selector de archivos
+const fileInput =
+    document.createElement("input");
 
+fileInput.type = "file";
+
+fileInput.style.display =
+    "none";
+
+fileInput.accept =
+    ".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.zip,.mp3,.mp4";
+
+document.body.appendChild(fileInput);
+
+// ☁️ Subir archivo seleccionado
+fileInput.addEventListener(
+    "change",
+    async function () {
+
+        const file =
+            fileInput.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        // 📦 Límite de 10 MB
+        const maxSize =
+            10 * 1024 * 1024;
+
+        if (file.size > maxSize) {
+
+            alert(
+                "El archivo no puede superar los 10 MB."
+            );
+
+            fileInput.value = "";
+
+            return;
+        }
+
+        try {
+
+            console.log(
+                "📎 Subiendo archivo:",
+                file.name
+            );
+
+
+            // 🔐 Nombre único
+            const extension =
+                file.name.includes(".")
+                    ? file.name
+                        .split(".")
+                        .pop()
+                        .toLowerCase()
+                    : "";
+
+            const fileName =
+                Date.now() +
+                "-" +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 8) +
+                (extension
+                    ? "." + extension
+                    : "");
+
+
+            // 📁 Carpeta del usuario
+            const filePath =
+                currentUserId +
+                "/" +
+                fileName;
+
+
+            // ☁️ Subir a Supabase
+            const {
+                error
+            } = await supabaseClient
+                .storage
+                .from("chat-files")
+                .upload(
+                    filePath,
+                    file,
+                    {
+                        cacheControl: "3600",
+                        upsert: false,
+                        contentType:
+                            file.type ||
+                            "application/octet-stream"
+                    }
+                );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+       console.log(
+    "✅ Archivo subido:",
+    filePath
+);
+
+
+// 💬 Crear mensaje de archivo
+const {
+    error: messageError
+} = await supabaseClient
+    .from("messages")
+    .insert({
+        sender_id: currentUserId,
+        receiver_id: person.id,
+        content: file.name,
+        message_type: "file",
+        file_path: filePath,
+        file_name: file.name,
+        file_type: file.type || "application/octet-stream",
+        file_size: file.size
+    });
+
+
+if (messageError) {
+    throw messageError;
+}
+
+
+console.log(
+    "📎 Mensaje de archivo creado:",
+    file.name
+);
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error subiendo archivo:",
+                error
+            );
+
+            alert(
+                "No se pudo subir el archivo."
+            );
+
+        }
+
+
+        // 🧹 Limpiar selector
+        fileInput.value = "";
+
+    }
+);
+// 📎 Abrir selector al pulsar el botón
+fileButton.addEventListener(
+    "click",
+    function () {
+
+        fileInput.click();
+
+    }
+);
 // =========================================
 // 💚 BOTÓN ZUMBIDO
 // =========================================
