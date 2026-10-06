@@ -356,6 +356,8 @@ async function startMessageNotifications() {
                     message
                 );
 
+ 
+
                 // Buscar perfil del remitente
                 const {
                     data: person,
@@ -383,6 +385,56 @@ async function startMessageNotifications() {
 
                     return;
                 }
+
+                // =========================================
+// 〰️ RECIBIR VIBRA
+// =========================================
+
+if (message.message_type === "buzz") {
+
+    console.log(
+        "〰️ Vibra recibida de:",
+        person.display_name ||
+        person.username
+    );
+playBuzzSound();
+    // Abrir el chat automáticamente
+    openChat(person);
+
+    // Esperar a que el chat aparezca en el DOM
+    setTimeout(function () {
+
+        const buzzChat =
+            document.getElementById("revibeChat");
+
+        if (!buzzChat) {
+            return;
+        }
+
+        // Reiniciar la animación
+        buzzChat.classList.remove(
+            "revibe-chat-buzz-animation"
+        );
+
+        void buzzChat.offsetWidth;
+
+        // Hacer vibrar la ventana
+        buzzChat.classList.add(
+            "revibe-chat-buzz-animation"
+        );
+
+        setTimeout(function () {
+
+            buzzChat.classList.remove(
+                "revibe-chat-buzz-animation"
+            );
+
+        }, 650);
+
+    }, 150);
+
+    return;
+}
 
                 showMessageNotification(
                     person,
@@ -3896,7 +3948,144 @@ async function markMessagesAsRead(friendId) {
         );
     }
 }
+// =========================================
+// 🔊 SONIDO DE VIBRA REVIBE
+// =========================================
 
+function playBuzzSound() {
+
+    try {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if (!AudioContext) {
+            return;
+        }
+
+        const audioContext =
+            new AudioContext();
+
+        if (audioContext.state === "suspended") {
+            audioContext.resume();
+        }
+
+        const now =
+            audioContext.currentTime;
+
+
+        // 〰️ Crea un zumbido con barrido de frecuencia
+        function createBuzz(
+            start,
+            duration,
+            startFreq,
+            endFreq,
+            volume
+        ) {
+
+            const oscillator =
+                audioContext.createOscillator();
+
+            const gain =
+                audioContext.createGain();
+
+            oscillator.type = "sawtooth";
+
+            oscillator.frequency.setValueAtTime(
+                startFreq,
+                start
+            );
+
+            oscillator.frequency.exponentialRampToValueAtTime(
+                endFreq,
+                start + duration
+            );
+
+            gain.gain.setValueAtTime(
+                0.0001,
+                start
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                volume,
+                start + 0.04
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.0001,
+                start + duration
+            );
+
+            oscillator.connect(gain);
+            gain.connect(
+                audioContext.destination
+            );
+
+            oscillator.start(start);
+
+            oscillator.stop(
+                start + duration + 0.05
+            );
+        }
+
+
+        // 〰️ Zumbido 1
+        createBuzz(
+            now,
+            0.55,
+            170,
+            430,
+            0.18
+        );
+
+
+        // 〰️ Zumbido 2
+        createBuzz(
+            now + 0.65,
+            0.55,
+            240,
+            520,
+            0.20
+        );
+
+
+        // 〰️ Zumbido 3
+        createBuzz(
+            now + 1.30,
+            0.60,
+            180,
+            470,
+            0.18
+        );
+
+
+        // 〰️ Pequeño remate
+        createBuzz(
+            now + 2.00,
+            0.55,
+            280,
+            600,
+            0.16
+        );
+
+
+        // 🔊 Cerramos después de terminar
+        setTimeout(function () {
+
+            audioContext.close();
+
+        }, 3000);
+
+    } catch (error) {
+
+        console.warn(
+            "🔇 No se pudo reproducir la vibra:",
+            error
+        );
+
+    }
+}
 // =========================================
 // ABRIR CHAT
 // =========================================
@@ -3938,7 +4127,31 @@ if (existingChat) {
     chat.id =
         "revibeChat";
 
-        
+        // =========================================
+// 〰️ ANIMACIÓN DE ZUMBIDO
+// =========================================
+
+function triggerBuzzAnimation() {
+
+    chat.classList.remove(
+        "revibe-chat-buzz-animation"
+    );
+
+    // Reiniciar la animación
+    void chat.offsetWidth;
+
+    chat.classList.add(
+        "revibe-chat-buzz-animation"
+    );
+
+    setTimeout(function () {
+
+        chat.classList.remove(
+            "revibe-chat-buzz-animation"
+        );
+
+    }, 650);
+}
 
         // =========================================
 // ⚡ CANAL REALTIME DEL CHAT
@@ -4209,10 +4422,15 @@ async function loadChatMessages() {
 
         // Crear cada mensaje
 
-        data.forEach(function(message) {
+      data.forEach(function(message) {
 
-            const bubble =
-                document.createElement("div");
+    // 〰️ Las vibras no se muestran como mensajes
+    if (message.message_type === "buzz") {
+        return;
+    }
+
+    const bubble =
+        document.createElement("div");
 
             bubble.className =
                 message.sender_id === currentUserId
@@ -4522,7 +4740,56 @@ buzzButton.textContent =
 buzzButton.title =
     "Enviar vibra";
 
+// =========================================
+// 〰️ ENVIAR ZUMBIDO / VIBRA
+// =========================================
 
+async function sendBuzz() {
+
+    if (!currentUserId) {
+        return;
+    }
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient
+            .from("messages")
+            .insert({
+                sender_id: currentUserId,
+                receiver_id: person.id,
+                content: "",
+                message_type: "buzz"
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        console.log(
+            "〰️ Vibra enviada."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error enviando vibra:",
+            error
+        );
+
+    }
+}
+
+
+// =========================================
+// 〰️ CONECTAR BOTÓN ZUMBIDO
+// =========================================
+
+buzzButton.addEventListener(
+    "click",
+    sendBuzz
+);
 // =========================================
 // CAMPO DE MENSAJE
 // =========================================
