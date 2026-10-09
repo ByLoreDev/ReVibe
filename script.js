@@ -4429,6 +4429,363 @@ function playBuzzSound() {
     }
 
 }
+
+// =========================================
+// 💦 REGALO REVIBE: GLOBO DE AGUA
+// =========================================
+
+// Niño caricaturesco original de ReVibe
+function getWaterBoySvg() {
+
+    return `
+        <svg
+            viewBox="0 0 180 170"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="Niño lanzando un globo de agua"
+        >
+            <defs>
+                <linearGradient
+                    id="revibeBoyShirt"
+                    x1="0" y1="0" x2="1" y2="1"
+                >
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="100%" stop-color="#bdf5dc"/>
+                </linearGradient>
+
+                <linearGradient
+                    id="revibeBoyBalloon"
+                    x1="0" y1="0" x2="1" y2="1"
+                >
+                    <stop offset="0%" stop-color="#7deaff"/>
+                    <stop offset="100%" stop-color="#078fe5"/>
+                </linearGradient>
+            </defs>
+
+            <!-- Sombra -->
+            <ellipse
+                cx="82" cy="153" rx="58" ry="9"
+                fill="#8bcbb3" opacity=".25"
+            />
+
+            <!-- Piernas en movimiento -->
+            <path
+                d="M75 111 L54 132 L39 139"
+                fill="none"
+                stroke="#f5b994"
+                stroke-width="13"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="M39 139 L24 139 Q17 148 30 151 L47 149 L53 141"
+                fill="#42c9a0"
+                stroke="#50362f"
+                stroke-width="3"
+                stroke-linejoin="round"
+            />
+
+            <path
+                d="M101 112 L121 129 L135 132"
+                fill="none"
+                stroke="#f5b994"
+                stroke-width="13"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="M134 130 Q151 125 154 137
+                   L150 145 L130 143 L126 137 Z"
+                fill="#42c9a0"
+                stroke="#50362f"
+                stroke-width="3"
+                stroke-linejoin="round"
+            />
+
+            <!-- Polo -->
+            <path
+                d="M69 75
+                   Q83 67 101 79
+                   L117 104
+                   L107 118
+                   L57 117
+                   L52 96 Z"
+                fill="url(#revibeBoyShirt)"
+                stroke="#50362f"
+                stroke-width="3.5"
+                stroke-linejoin="round"
+            />
+
+            <!-- Cuello -->
+            <path
+                d="M79 70 L81 84 L94 85 L96 72"
+                fill="#f5b994"
+            />
+
+            <!-- Brazo que lanza -->
+            <path
+                d="M96 84 L119 76 L135 80"
+                fill="none"
+                stroke="#f5b994"
+                stroke-width="11"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="M126 79 Q137 72 142 79
+                   Q144 86 135 88 L127 86"
+                fill="#ffd0b1"
+            />
+
+            <!-- Brazo posterior -->
+            <path
+                d="M65 88 L53 105 L42 103"
+                fill="none"
+                stroke="#f5b994"
+                stroke-width="11"
+                stroke-linecap="round"
+            />
+
+            <!-- Cabeza -->
+            <ellipse
+                cx="81" cy="53" rx="34" ry="37"
+                fill="#ffd0b1"
+                stroke="#50362f"
+                stroke-width="3"
+            />
+
+            <!-- Oreja -->
+            <circle
+                cx="49" cy="57" r="8"
+                fill="#ffc5a4"
+                stroke="#50362f"
+                stroke-width="2"
+            />
+
+            <!-- Cabello despeinado -->
+            <path
+                d="M49 53
+                   L40 36 L53 39
+                   L51 22 L66 32
+                   L75 13 L85 29
+                   L101 20 L100 35
+                   L119 32 L111 48
+                   L103 55
+                   L99 42 L88 49
+                   L80 39 L68 50
+                   L58 44 Z"
+                fill="#654033"
+                stroke="#402c28"
+                stroke-width="3"
+                stroke-linejoin="round"
+            />
+
+            <!-- Ojos alegres -->
+            <path
+                d="M62 55 Q67 49 72 55"
+                fill="none"
+                stroke="#402c28"
+                stroke-width="3"
+                stroke-linecap="round"
+            />
+
+            <ellipse
+                cx="91" cy="55" rx="4" ry="6"
+                fill="#402c28"
+            />
+
+            <circle cx="92" cy="53" r="1.5" fill="#ffffff"/>
+
+            <!-- Mejillas -->
+            <ellipse
+                cx="59" cy="67" rx="7" ry="4"
+                fill="#ff9b9b" opacity=".6"
+            />
+
+            <ellipse
+                cx="100" cy="66" rx="7" ry="4"
+                fill="#ff9b9b" opacity=".6"
+            />
+
+            <!-- Sonrisa -->
+            <path
+                d="M71 68 Q82 82 96 67
+                   Q94 81 83 81 Q76 79 71 68"
+                fill="#a93c46"
+            />
+
+            <path
+                d="M76 70 Q84 75 92 70"
+                fill="none"
+                stroke="#ffffff"
+                stroke-width="3"
+                stroke-linecap="round"
+            />
+        </svg>
+    `;
+}
+
+
+// Globo de agua independiente
+function getWaterBalloonSvg() {
+
+    return `
+        <svg
+            viewBox="0 0 80 100"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+        >
+            <defs>
+                <linearGradient
+                    id="revibeWaterGradient"
+                    x1="0" y1="0" x2="1" y2="1"
+                >
+                    <stop offset="0%" stop-color="#a4f6ff"/>
+                    <stop offset="45%" stop-color="#39cafa"/>
+                    <stop offset="100%" stop-color="#087ddd"/>
+                </linearGradient>
+            </defs>
+
+            <path
+                d="M40 9
+                   C57 9 69 25 66 44
+                   C63 65 48 83 40 88
+                   C30 82 16 65 13 44
+                   C10 25 23 9 40 9 Z"
+                fill="url(#revibeWaterGradient)"
+                stroke="#0877ba"
+                stroke-width="3"
+            />
+
+            <ellipse
+                cx="29" cy="30" rx="7" ry="13"
+                transform="rotate(-28 29 30)"
+                fill="#ffffff"
+                opacity=".75"
+            />
+
+            <path
+                d="M40 87 L35 96 L45 96 Z"
+                fill="#168fd0"
+                stroke="#0877ba"
+                stroke-width="2"
+            />
+        </svg>
+    `;
+}
+
+
+// Crear la tarjeta del regalo en el historial del chat
+function createWaterBalloonGiftBubble(message) {
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        message.sender_id === currentUserId
+            ? "revibe-message sent revibe-gift-message"
+            : "revibe-message received revibe-gift-message";
+
+    bubble.dataset.messageId =
+        message.id;
+
+    const art =
+        document.createElement("div");
+
+    art.className =
+        "revibe-water-gift-art";
+
+    art.innerHTML = `
+        <div class="revibe-water-gift-boy">
+            ${getWaterBoySvg()}
+        </div>
+
+        <div class="revibe-water-gift-balloon">
+            ${getWaterBalloonSvg()}
+        </div>
+    `;
+
+    const label =
+        document.createElement("strong");
+
+    label.textContent =
+        "💦 ¡Globo de agua!";
+
+    const time =
+        document.createElement("small");
+
+    time.className =
+        "revibe-message-time";
+
+    time.textContent =
+        new Date(
+            message.created_at || Date.now()
+        ).toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    bubble.appendChild(art);
+    bubble.appendChild(label);
+    bubble.appendChild(time);
+
+    return bubble;
+}
+
+
+// Animación que verá quien recibe el regalo
+function playWaterBalloonAnimation() {
+
+    // Evitar dos animaciones simultáneas
+    const existing =
+        document.querySelector(
+            ".revibe-water-gift-effect"
+        );
+
+    if (existing) {
+        existing.remove();
+    }
+
+    const effect =
+        document.createElement("div");
+
+    effect.className =
+        "revibe-water-gift-effect";
+
+    effect.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    effect.innerHTML = `
+        <div class="revibe-water-gift-runner">
+            ${getWaterBoySvg()}
+        </div>
+
+        <div class="revibe-water-gift-flying-balloon">
+            ${getWaterBalloonSvg()}
+        </div>
+
+        <div class="revibe-water-gift-splash">
+            <span class="revibe-water-splash-emoji">💦</span>
+            <strong>¡PLOP!</strong>
+        </div>
+    `;
+
+    document.body.appendChild(effect);
+
+    // Retirar el efecto al finalizar
+    setTimeout(function () {
+
+        if (effect.parentNode) {
+            effect.remove();
+        }
+
+    }, 2300);
+}
 // =========================================
 // ABRIR CHAT
 // =========================================
@@ -5009,7 +5366,19 @@ async function loadChatMessages() {
         return;
     }
 
+// 🎁 Mostrar regalos guardados en el historial
+if (
+    message.message_type === "gift" &&
+    message.gift_type === "water_balloon"
+) {
 
+    const giftBubble =
+        createWaterBalloonGiftBubble(message);
+
+    messages.appendChild(giftBubble);
+
+    return;
+}
     // 📎 ARCHIVO
     if (
         message.message_type === "file"
@@ -5200,6 +5569,31 @@ function showBuzzReceived() {
             if (existing) {
                 return;
             }
+
+            // 🎁 Recibir regalo en tiempo real
+if (
+    message.message_type === "gift" &&
+    message.gift_type === "water_balloon"
+) {
+
+    // Quitar el mensaje de bienvenida
+    if (empty && empty.parentNode) {
+        empty.remove();
+    }
+
+    const giftBubble =
+        createWaterBalloonGiftBubble(message);
+
+    messages.appendChild(giftBubble);
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
+    // 💦 ¡PLOP! Animación del regalo
+    playWaterBalloonAnimation();
+
+    return;
+}
 
             // Quitar mensaje de "no hay mensajes"
             if (empty && empty.parentNode) {
@@ -5477,7 +5871,7 @@ fileButton.addEventListener(
     }
 );
 // =========================================
-// 💚 BOTÓN ZUMBIDO
+// BOTÓN ZUMBIDO
 // =========================================
 
 const buzzButton =
@@ -5492,6 +5886,262 @@ buzzButton.className =
 buzzButton.textContent = "🚨";
 buzzButton.title = "Enviar mensaje urgente";
 
+// =========================================
+// 🎁 BOTÓN DE REGALOS
+// =========================================
+
+const giftButton =
+    document.createElement("button");
+
+giftButton.type = "button";
+
+giftButton.className =
+    "revibe-chat-tool revibe-chat-gift";
+
+giftButton.textContent = "🎁";
+
+giftButton.title =
+    "Enviar un regalo";
+
+    // =========================================
+// 🎁 SELECTOR DE REGALOS REVIBE
+// =========================================
+
+function openGiftPicker() {
+
+    // Evitar paneles duplicados
+    if (
+        document.querySelector(
+            ".revibe-gift-overlay"
+        )
+    ) {
+        return;
+    }
+
+    const overlay =
+        document.createElement("div");
+
+    overlay.className =
+        "revibe-gift-overlay";
+
+    const panel =
+        document.createElement("div");
+
+    panel.className =
+        "revibe-gift-panel";
+
+    panel.innerHTML = `
+        <div class="revibe-gift-header">
+            <div>
+                <span class="revibe-gift-title-icon">
+                    🎁
+                </span>
+
+                <div>
+                    <h3>Regalos</h3>
+                    <p>Envía una sorpresa especial</p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="revibe-gift-close"
+                aria-label="Cerrar regalos"
+            >×</button>
+        </div>
+
+        <div class="revibe-gift-grid">
+
+            <button
+                type="button"
+                class="revibe-gift-option"
+                data-gift="water_balloon"
+            >
+                <span class="revibe-gift-art">
+                    <span class="revibe-gift-boy">
+                        🧒🏻
+                    </span>
+                    <span class="revibe-gift-balloon">
+                        💦
+                    </span>
+                </span>
+
+                <strong>¡Globo de agua!</strong>
+
+                <small>
+                    Un chapuzón sorpresa
+                </small>
+            </button>
+
+        </div>
+
+        <p class="revibe-gift-footer">
+            Más regalos divertidos muy pronto 💚
+        </p>
+    `;
+
+    overlay.appendChild(panel);
+
+    document.body.appendChild(overlay);
+
+
+    // Cerrar el selector
+    panel.querySelector(
+        ".revibe-gift-close"
+    ).addEventListener(
+        "click",
+        function () {
+            overlay.remove();
+        }
+    );
+
+    overlay.addEventListener(
+        "click",
+        function (event) {
+            if (event.target === overlay) {
+                overlay.remove();
+            }
+        }
+    );
+
+
+    // Enviar el primer regalo
+    panel.querySelector(
+        '[data-gift="water_balloon"]'
+    ).addEventListener(
+        "click",
+        async function () {
+
+            if (!currentUserId) {
+                alert(
+                    "Tu sesión no está activa."
+                );
+                return;
+            }
+
+            const giftOption =
+                this;
+
+            giftOption.disabled = true;
+
+            const originalText =
+                giftOption.querySelector(
+                    "strong"
+                ).textContent;
+
+            giftOption.querySelector(
+                "strong"
+            ).textContent = "Enviando...";
+
+            try {
+
+                const {
+                    data,
+                    error
+                } = await supabaseClient
+                    .from("messages")
+                    .insert({
+                        sender_id: currentUserId,
+                        receiver_id: person.id,
+                        content: "💦 ¡Globo de agua!",
+                        message_type: "gift",
+                        gift_type: "water_balloon"
+                    })
+                    .select(
+                        "id, created_at"
+                    )
+                    .single();
+
+                if (error) {
+                    throw error;
+                }
+
+
+                // Mostrar el regalo enviado
+                if (
+                    empty &&
+                    empty.parentNode
+                ) {
+                    empty.remove();
+                }
+
+                const bubble =
+                    document.createElement("div");
+
+                bubble.className =
+                    "revibe-message sent revibe-gift-message";
+
+                bubble.dataset.messageId =
+                    data.id;
+
+                const giftText =
+                    document.createElement("div");
+
+                giftText.className =
+                    "revibe-message-text";
+
+                giftText.textContent =
+                    "🎁 ¡Globo de agua!";
+
+                const time =
+                    document.createElement("small");
+
+                time.className =
+                    "revibe-message-time";
+
+                time.textContent =
+                    new Date(
+                        data.created_at
+                    ).toLocaleTimeString(
+                        [],
+                        {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        }
+                    );
+
+                bubble.appendChild(giftText);
+                bubble.appendChild(time);
+
+                messages.appendChild(bubble);
+
+                messages.scrollTop =
+                    messages.scrollHeight;
+
+                overlay.remove();
+
+                console.log(
+                    "💦 ¡Globo de agua enviado!"
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Error enviando el regalo:",
+                    error
+                );
+
+                giftOption.disabled = false;
+
+                giftOption.querySelector(
+                    "strong"
+                ).textContent = originalText;
+
+                alert(
+                    "No se pudo enviar el regalo. " +
+                    "Inténtalo nuevamente."
+                );
+            }
+        }
+    );
+}
+
+
+// Abrir el selector al pulsar 🎁
+giftButton.addEventListener(
+    "click",
+    openGiftPicker
+);
 // =========================================
 // 〰️ ENVIAR ZUMBIDO / VIBRA
 // =========================================
@@ -5865,6 +6515,7 @@ toolbar.className =
 toolbar.appendChild(emojiButton);
 toolbar.appendChild(fileButton);
 toolbar.appendChild(buzzButton);
+toolbar.appendChild(giftButton);
 
 
 // 🚨 Interruptor de mensajes urgentes

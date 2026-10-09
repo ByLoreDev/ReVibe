@@ -3485,3 +3485,584 @@ footer span {
 .revibe-urgent-label {
     color: #999;
 }
+/* =========================================
+   🎁 SELECTOR DE REGALOS REVIBE
+========================================= */
+
+.revibe-gift-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+    box-sizing: border-box;
+
+    background: rgba(24, 48, 39, 0.42);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    animation: revibeGiftFadeIn 0.2s ease;
+}
+
+.revibe-gift-panel {
+    width: 100%;
+    max-width: 440px;
+    max-height: 85vh;
+    overflow-y: auto;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    background: #ffffff;
+    border: 1px solid #e4f1eb;
+    border-radius: 22px;
+
+    box-shadow:
+        0 20px 60px rgba(27, 74, 55, 0.22);
+
+    animation: revibeGiftPopIn 0.25s ease;
+}
+
+
+/* ENCABEZADO */
+
+.revibe-gift-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.revibe-gift-header > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.revibe-gift-title-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e9faf2;
+    border-radius: 15px;
+
+    font-size: 27px;
+}
+
+.revibe-gift-header h3 {
+    margin: 0;
+
+    color: #263c32;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.revibe-gift-header p {
+    margin: 4px 0 0;
+
+    color: #809087;
+    font-size: 12px;
+}
+
+.revibe-gift-close {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f3f7f5;
+    color: #6c7e74;
+
+    font-size: 24px;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.revibe-gift-close:hover {
+    background: #e3f7ed;
+    transform: rotate(90deg);
+}
+
+
+/* CUADRÍCULA DE REGALOS */
+
+.revibe-gift-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.revibe-gift-option {
+    min-width: 0;
+    padding: 12px 8px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    border: 1px solid #e6eee9;
+    border-radius: 17px;
+
+    background: #fbfdfc;
+    color: #31483c;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.revibe-gift-option:hover:not(:disabled) {
+    border-color: #36c995;
+    background: #edfbf5;
+    transform: translateY(-3px);
+}
+
+.revibe-gift-option:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.revibe-gift-art {
+    position: relative;
+
+    width: 100%;
+    height: 115px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 13px;
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #ffffff 0%,
+            #ddf9ed 100%
+        );
+}
+
+.revibe-gift-boy {
+    font-size: 57px;
+    line-height: 1;
+
+    transform: rotate(-8deg);
+}
+
+.revibe-gift-balloon {
+    position: absolute;
+    top: 23px;
+    right: 14px;
+
+    font-size: 31px;
+
+    animation:
+        revibeGiftFloat 1.7s ease-in-out infinite;
+}
+
+.revibe-gift-option strong {
+    font-size: 13px;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.revibe-gift-option small {
+    color: #83938a;
+    font-size: 11px;
+    text-align: center;
+}
+
+.revibe-gift-footer {
+    margin: 17px 0 0;
+
+    color: #819187;
+    font-size: 12px;
+    text-align: center;
+}
+
+
+/* ANIMACIONES DEL PANEL */
+
+@keyframes revibeGiftFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes revibeGiftPopIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes revibeGiftFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(-5deg);
+    }
+
+    50% {
+        transform: translateY(-7px) rotate(7deg);
+    }
+}
+
+
+/* ADAPTACIÓN A MÓVILES */
+
+@media (max-width: 480px) {
+    .revibe-gift-overlay {
+        padding: 12px;
+    }
+
+    .revibe-gift-panel {
+        max-width: 100%;
+        padding: 16px;
+        border-radius: 20px;
+    }
+
+    .revibe-gift-art {
+        height: 100px;
+    }
+
+    .revibe-gift-boy {
+        font-size: 49px;
+    }
+
+    .revibe-gift-balloon {
+        right: 8px;
+        font-size: 27px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .revibe-gift-overlay,
+    .revibe-gift-panel,
+    .revibe-gift-balloon {
+        animation: none;
+    }
+}
+/* =========================================
+   💦 REGALO REVIBE: GLOBO DE AGUA
+========================================= */
+
+/* Tarjeta del regalo dentro del chat */
+.revibe-gift-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    max-width: 230px;
+}
+
+.revibe-gift-message > strong {
+    color: #287b60;
+    font-size: 14px;
+}
+
+.revibe-water-gift-art {
+    position: relative;
+    width: 200px;
+    height: 155px;
+    overflow: hidden;
+    border-radius: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            #ffffff 0%,
+            #d8f9ed 100%
+        );
+
+    border: 1px solid #c8efdf;
+}
+
+.revibe-water-gift-boy {
+    position: absolute;
+    left: 16px;
+    bottom: 0;
+
+    width: 150px;
+
+    animation:
+        revibeWaterBoyIdle 1.3s ease-in-out infinite;
+}
+
+.revibe-water-gift-boy svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.revibe-water-gift-balloon {
+    position: absolute;
+    right: 16px;
+    top: 25px;
+
+    width: 36px;
+
+    animation:
+        revibeWaterBalloonIdle 1s ease-in-out infinite;
+}
+
+.revibe-water-gift-balloon svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+@keyframes revibeWaterBoyIdle {
+    0%, 100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(-4px) rotate(-2deg);
+    }
+}
+
+@keyframes revibeWaterBalloonIdle {
+    0%, 100% {
+        transform: translateY(0) rotate(-5deg);
+    }
+
+    50% {
+        transform: translateY(-6px) rotate(5deg);
+    }
+}
+
+
+/* =========================================
+   💦 EFECTO AL RECIBIR EL REGALO
+========================================= */
+
+.revibe-water-gift-effect {
+    position: fixed;
+    inset: 0;
+    z-index: 6000;
+
+    overflow: hidden;
+    pointer-events: none;
+
+    background: transparent;
+}
+
+/* Niño entrando desde la izquierda */
+.revibe-water-gift-runner {
+    position: absolute;
+
+    left: -190px;
+    bottom: 12%;
+
+    width: clamp(135px, 26vw, 205px);
+
+    animation:
+        revibeWaterBoyThrow 1.8s ease-in-out forwards;
+}
+
+.revibe-water-gift-runner svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Globo que cruza la pantalla */
+.revibe-water-gift-flying-balloon {
+    position: absolute;
+
+    left: 20%;
+    top: 43%;
+
+    width: clamp(48px, 10vw, 82px);
+
+    opacity: 0;
+
+    animation:
+        revibeWaterBalloonFly 1.15s 0.35s
+        cubic-bezier(.2, .7, .3, 1) forwards;
+}
+
+.revibe-water-gift-flying-balloon svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Salpicadura */
+.revibe-water-gift-splash {
+    position: absolute;
+
+    left: 50%;
+    top: 42%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+
+    opacity: 0;
+
+    transform: translate(-50%, -50%) scale(.25);
+
+    animation:
+        revibeWaterSplash 0.85s 1.15s ease-out forwards;
+}
+
+.revibe-water-splash-emoji {
+    font-size: clamp(80px, 18vw, 155px);
+    line-height: 1;
+
+    filter:
+        drop-shadow(0 8px 12px rgba(17, 155, 220, .22));
+}
+
+.revibe-water-gift-splash strong {
+    color: #ffffff;
+
+    font-size: clamp(32px, 8vw, 64px);
+    font-weight: 900;
+    font-style: italic;
+
+    -webkit-text-stroke: 2px #246ee8;
+
+    text-shadow:
+        3px 4px 0 #2457c7,
+        0 0 18px rgba(71, 195, 255, .7);
+}
+
+
+/* =========================================
+   🎬 SECUENCIA DE ANIMACIÓN
+========================================= */
+
+@keyframes revibeWaterBoyThrow {
+    0% {
+        left: -190px;
+        transform: translateY(0) rotate(-5deg);
+    }
+
+    35% {
+        transform: translateY(-16px) rotate(4deg);
+    }
+
+    65% {
+        transform: translateY(0) rotate(-3deg);
+    }
+
+    100% {
+        left: 16%;
+        transform: translateY(0) rotate(0);
+    }
+}
+
+@keyframes revibeWaterBalloonFly {
+    0% {
+        opacity: 0;
+        transform: translate(0, 20px) rotate(-20deg) scale(.65);
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    55% {
+        transform: translate(24vw, -70px) rotate(80deg) scale(1.1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(48vw, 10px) rotate(200deg) scale(.85);
+    }
+}
+
+@keyframes revibeWaterSplash {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.25);
+    }
+
+    35% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+
+    65% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.25);
+    }
+}
+
+
+/* =========================================
+   📱 AJUSTES PARA MÓVILES
+========================================= */
+
+@media (max-width: 600px) {
+    .revibe-water-gift-runner {
+        bottom: 18%;
+        width: 135px;
+    }
+
+    .revibe-water-gift-splash {
+        top: 40%;
+    }
+
+    .revibe-water-gift-flying-balloon {
+        top: 39%;
+    }
+
+    .revibe-water-gift-art {
+        width: 180px;
+        max-width: 100%;
+        height: 140px;
+    }
+}
+
+/* Respetar la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .revibe-water-gift-boy,
+    .revibe-water-gift-balloon {
+        animation: none;
+    }
+
+    .revibe-water-gift-effect {
+        display: none;
+    }
+}
