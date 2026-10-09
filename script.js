@@ -4735,9 +4735,233 @@ function createWaterBalloonGiftBubble(message) {
     return bubble;
 }
 
+// =========================================
+// 🔊 SONIDO DEL GLOBO DE AGUA
+// =========================================
 
+let revibeWaterAudioContext = null;
+
+
+// Preparar audio tras la primera interacción del usuario
+function prepareRevibeWaterAudio() {
+
+    const AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+        return;
+    }
+
+    if (!revibeWaterAudioContext) {
+        revibeWaterAudioContext =
+            new AudioContextClass();
+    }
+
+    if (
+        revibeWaterAudioContext.state ===
+        "suspended"
+    ) {
+        revibeWaterAudioContext
+            .resume()
+            .catch(function (error) {
+                console.warn(
+                    "Audio no disponible:",
+                    error
+                );
+            });
+    }
+}
+
+
+// Activar audio con la primera interacción
+window.addEventListener(
+    "pointerdown",
+    prepareRevibeWaterAudio,
+    { once: true }
+);
+
+window.addEventListener(
+    "keydown",
+    prepareRevibeWaterAudio,
+    { once: true }
+);
+
+
+// Reproducir el silbido, el PLOP y el agua
+function playWaterBalloonSound() {
+
+    const audio =
+        revibeWaterAudioContext;
+
+    // El navegador puede impedir sonido automático
+    if (!audio || audio.state !== "running") {
+        console.warn(
+            "Activa el audio interactuando con ReVibe."
+        );
+        return;
+    }
+
+    const now = audio.currentTime;
+
+
+    // Crear sonido de agua o salpicadura
+    function makeWaterNoise(
+        start,
+        duration,
+        startFrequency,
+        endFrequency,
+        volume
+    ) {
+
+        const buffer =
+            audio.createBuffer(
+                1,
+                Math.ceil(
+                    audio.sampleRate * duration
+                ),
+                audio.sampleRate
+            );
+
+        const samples =
+            buffer.getChannelData(0);
+
+        for (
+            let i = 0;
+            i < samples.length;
+            i++
+        ) {
+            samples[i] =
+                Math.random() * 2 - 1;
+        }
+
+        const source =
+            audio.createBufferSource();
+
+        source.buffer = buffer;
+
+        const filter =
+            audio.createBiquadFilter();
+
+        filter.type = "lowpass";
+
+        filter.frequency.setValueAtTime(
+            startFrequency,
+            start
+        );
+
+        filter.frequency.exponentialRampToValueAtTime(
+            endFrequency,
+            start + duration
+        );
+
+        const gain =
+            audio.createGain();
+
+        gain.gain.setValueAtTime(
+            0.0001,
+            start
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            volume,
+            start + Math.min(
+                0.025,
+                duration / 3
+            )
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            start + duration
+        );
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(audio.destination);
+
+        source.start(start);
+        source.stop(start + duration + 0.03);
+    }
+
+
+    // 💨 1. Silbido del lanzamiento
+    makeWaterNoise(
+        now,
+        0.5,
+        1500,
+        450,
+        0.09
+    );
+
+
+    // 💦 2. ¡PLOP! sincronizado con la salpicadura
+    const popTime =
+        now + 1.15;
+
+    makeWaterNoise(
+        popTime,
+        0.22,
+        2200,
+        380,
+        0.25
+    );
+
+
+    // Tono grave para darle personalidad al PLOP
+    const popTone =
+        audio.createOscillator();
+
+    const popGain =
+        audio.createGain();
+
+    popTone.type = "sine";
+
+    popTone.frequency.setValueAtTime(
+        420,
+        popTime
+    );
+
+    popTone.frequency.exponentialRampToValueAtTime(
+        110,
+        popTime + 0.28
+    );
+
+    popGain.gain.setValueAtTime(
+        0.0001,
+        popTime
+    );
+
+    popGain.gain.linearRampToValueAtTime(
+        0.18,
+        popTime + 0.02
+    );
+
+    popGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        popTime + 0.3
+    );
+
+    popTone.connect(popGain);
+    popGain.connect(audio.destination);
+
+    popTone.start(popTime);
+    popTone.stop(popTime + 0.32);
+
+
+    // 💧 3. Chapuzón
+    makeWaterNoise(
+        popTime + 0.03,
+        0.65,
+        3500,
+        650,
+        0.15
+    );
+}
 // Animación que verá quien recibe el regalo
 function playWaterBalloonAnimation() {
+
+    playWaterBalloonSound();
 
     // Evitar dos animaciones simultáneas
     const existing =
