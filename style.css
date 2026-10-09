@@ -3392,6 +3392,42 @@ footer span {
     font-size: 12px;
     opacity: 0.7;
 }
+
+/* =========================================
+   🚨 ZUMBIDO SUTIL EN MÓVIL
+========================================= */
+
+@keyframes revibeBuzzMobile {
+
+    0% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-2px);
+    }
+
+    40% {
+        transform: translateX(2px);
+    }
+
+    60% {
+        transform: translateX(-2px);
+    }
+
+    80% {
+        transform: translateX(1px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.revibe-chat-buzz-mobile {
+    animation:
+        revibeBuzzMobile 0.35s ease forwards;
+}
 /* =========================================
    🚨 INTERRUPTOR DE URGENTES
 ========================================= */

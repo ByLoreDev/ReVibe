@@ -308,6 +308,78 @@ function showMessageNotification(person, message) {
 // 🔔 ESCUCHAR NOTIFICACIONES DE MENSAJES
 // =========================================
 
+// =========================================
+// 🚨 EFECTO DEL URGENTE
+// =========================================
+
+function triggerUrgentFeedback() {
+
+    // 🔊 Sonido siempre
+    playBuzzSound();
+
+    const isMobile =
+        window.matchMedia("(max-width: 768px)").matches;
+
+    const buzzChat =
+        document.getElementById("revibeChat");
+
+    if (isMobile) {
+
+        // 📳 Vibración física del celular
+        if ("vibrate" in navigator) {
+
+
+    navigator.vibrate(900);
+
+    // 📳 Segunda vibración
+    setTimeout(function () {
+
+        navigator.vibrate(900);
+
+    }, 1500);
+}     
+        
+
+        // 📱 Movimiento visual muy sutil
+        if (buzzChat) {
+
+           buzzChat.classList.remove(
+    "revibe-chat-buzz-mobile"
+);
+
+void buzzChat.offsetWidth;
+
+buzzChat.classList.add(
+    "revibe-chat-buzz-mobile"
+);
+        }
+
+        return;
+    }
+
+    // 💻 Escritorio
+    if (buzzChat) {
+
+        buzzChat.classList.remove(
+            "revibe-chat-buzz-animation"
+        );
+
+        void buzzChat.offsetWidth;
+
+        buzzChat.classList.add(
+            "revibe-chat-buzz-animation"
+        );
+
+        setTimeout(function () {
+
+            buzzChat.classList.remove(
+                "revibe-chat-buzz-animation"
+            );
+
+        }, 650);
+    }
+}
+
 async function startMessageNotifications() {
 
     if (!currentUserId) {
@@ -358,33 +430,190 @@ async function startMessageNotifications() {
 
  
 
-                // Buscar perfil del remitente
-                const {
-                    data: person,
-                    error
-                } = await supabaseClient
-                    .from("profiles")
-                    .select(`
-                        id,
-                        username,
-                        display_name,
-                        avatar_url
-                    `)
-                    .eq(
-                        "id",
-                        message.sender_id
-                    )
-                    .single();
+                // Buscar perfil y configuración del urgente
+// al mismo tiempo
+const [
+    profileResult,
+    friendshipResult
+] = await Promise.all([
 
-                if (error || !person) {
+    supabaseClient
+        .from("profiles")
+        .select(`
+            id,
+            username,
+            display_name,
+            avatar_url
+        `)
+        .eq(
+            "id",
+            message.sender_id
+        )
+        .single(),
 
-                    console.error(
-                        "❌ Error obteniendo remitente:",
-                        error
-                    );
+    supabaseClient
+        .from("friendships")
+        .select("urgent_enabled")
+        .or(
+            `and(requester_id.eq.${currentUserId},receiver_id.eq.${message.sender_id}),and(requester_id.eq.${message.sender_id},receiver_id.eq.${currentUserId})`
+        )
+        .limit(1)
+        .maybeSingle()
+]);
 
-                    return;
-                }
+
+const person =
+    profileResult.data;
+
+const error =
+    profileResult.error;
+
+const friendship =
+    friendshipResult.data;
+
+const friendshipError =
+    friendshipResult.error;
+
+
+if (error || !person) {
+
+    console.error(
+        "❌ Error obteniendo remitente:",
+        error
+    );
+
+    return;
+}
+
+
+// =========================================
+// 🚨 MENSAJE URGENTE
+// =========================================
+
+if (
+    message.message_type === "buzz"
+) {
+
+    console.log(
+        "🚨 Urgente recibido de:",
+        person.display_name ||
+        person.username
+    );
+
+
+    // =========================================
+    // 🔐 COMPROBAR URGENTES
+    // =========================================
+
+    if (friendshipError) {
+
+        console.error(
+            "❌ Error comprobando urgentes:",
+            friendshipError
+        );
+
+    } else if (
+        friendship &&
+        friendship.urgent_enabled === false
+    ) {
+
+        console.log(
+            "🔕 Urgente bloqueado para:",
+            person.display_name ||
+            person.username
+        );
+
+        return;
+    }
+
+
+    // =========================================
+    // 🚨 URGENTE PERMITIDO
+    // =========================================
+
+    console.log(
+        "🚨 Ejecutando urgente."
+    );
+
+
+    playBuzzSound();
+
+
+    // =========================================
+    // 💬 ABRIR SOLO SI NO ESTÁ ABIERTO
+    // =========================================
+
+    const currentChat =
+        document.getElementById(
+            "revibeChat"
+        );
+
+    const isSameChat =
+        currentChat &&
+        currentChat.dataset.personId ===
+            person.id;
+
+
+    if (!isSameChat) {
+
+        openChat(person);
+
+    }
+
+
+    // =========================================
+    // 📳 ANIMAR CHAT
+    // =========================================
+
+    setTimeout(function () {
+
+        const buzzChat =
+            document.getElementById(
+                "revibeChat"
+            );
+
+        if (!buzzChat) {
+            return;
+        }
+
+
+        buzzChat.classList.remove(
+            "revibe-chat-buzz-animation"
+        );
+
+
+        void buzzChat.offsetWidth;
+
+
+        buzzChat.classList.add(
+            "revibe-chat-buzz-animation"
+        );
+
+
+        setTimeout(function () {
+
+            buzzChat.classList.remove(
+                "revibe-chat-buzz-animation"
+            );
+
+        }, 650);
+
+    }, 50);
+
+
+    return;
+}
+
+
+showMessageNotification(
+    person,
+    message
+);
+               
+                    
+                  
+                  
+
 
                 // =========================================
 // 〰️ RECIBIR VIBRA
@@ -452,47 +681,28 @@ if (message.message_type === "buzz") {
     );
 
 
-    playBuzzSound();
+   // =========================================
+// 🚨 URGENTE PERMITIDO
+// =========================================
+
+console.log(
+    "🚨 Ejecutando urgente."
+);
 
 
-    openChat(person);
+// 💬 Abrir chat primero
+openChat(person);
 
 
-    setTimeout(function () {
+// 📱💻 Ejecutar efecto según dispositivo
+setTimeout(function () {
 
-        const buzzChat =
-            document.getElementById(
-                "revibeChat"
-            );
+    triggerUrgentFeedback();
 
-        if (!buzzChat) {
-            return;
-        }
+}, 50);
 
 
-        buzzChat.classList.remove(
-            "revibe-chat-buzz-animation"
-        );
-
-
-        void buzzChat.offsetWidth;
-
-
-        buzzChat.classList.add(
-            "revibe-chat-buzz-animation"
-        );
-
-
-        setTimeout(function () {
-
-            buzzChat.classList.remove(
-                "revibe-chat-buzz-animation"
-            );
-
-        }, 650);
-
-    }, 150);
-
+return;
 
     return;
 }
@@ -6660,9 +6870,12 @@ if (googleButton) {
                 await supabaseClient
                     .auth
                     .signInWithOAuth({
-                        provider:
-                            "google"
-                    });
+    provider: "google",
+    options: {
+        redirectTo:
+            "https://byloredev.github.io/ReVibe/"
+    }
+});
 
 
             if (error) {
