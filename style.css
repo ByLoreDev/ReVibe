@@ -4066,3 +4066,14 @@ footer span {
         display: none;
     }
 }
+/* =========================================
+   💚 CAPAS DE REGALOS SOBRE EL CHAT
+========================================= */
+
+.revibe-gift-overlay {
+    z-index: 2147483000 !important;
+}
+
+.revibe-water-gift-effect {
+    z-index: 2147483500 !important;
+}
