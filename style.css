@@ -4055,34 +4055,7 @@ footer span {
     }
 }
 
-/* Respetar la preferencia de movimiento reducido */
-@media (prefers-reduced-motion: reduce) {
-    .revibe-water-gift-boy,
-    .revibe-water-gift-balloon,
-    .revibe-water-gift-runner,
-    .revibe-water-gift-flying-balloon,
-    .revibe-water-gift-splash {
-        animation: none !important;
-    }
-
-    /* No ocultar el regalo en móviles */
-    .revibe-water-gift-effect {
-        display: block !important;
-    }
-
-    .revibe-water-gift-runner {
-        left: 16%;
-    }
-
-    .revibe-water-gift-flying-balloon {
-        opacity: 1;
-    }
-
-    .revibe-water-gift-splash {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
+/
 /* =========================================
    💚 CAPAS DE REGALOS SOBRE EL CHAT
 ========================================= */
